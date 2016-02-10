@@ -1,31 +1,10 @@
 <!DOCTYPE HTML>
-<!--#include file="inc\conexao.asp"-->
-<!--#include file="inc\funcoes.asp"-->
-<%
-strLogin = LimpaSQLInjection(request("login"))
-strSenha = Encripta(LimpaSQLInjection(request("senha")))
-bolLoginOK = true
-
-'response.write Decripta(strSenha)
-if strLogin <> "" then
-	strSQL = "select * from usuario usu where usu.login =  '" & strLogin & "' and usu.senha = '" & strSenha & "'"
-	set objRS = server.CreateObject("adodb.recordset")
-	objRS.open strSQL,conexao,3,3
-
-	if objRS.EOF then
-		bolLoginOK = false
-	else
-		bolLoginOK = true
-		session("usuario_id") = objRS("usuario_id")
-	end if
-end if
-%>
 <html>
 <head>
-<title>EVA::Login</title>
+<title>EVA ::Home </title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="keywords" content="esquadrias, vidros, aluminio" />
+<meta name="keywords" content="" />
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
 <!-- Bootstrap Core CSS -->
 <link href="css/bootstrap.css" rel='stylesheet' type='text/css' />
@@ -60,50 +39,122 @@ end if
 <script src="js/custom.js"></script>
 <link href="css/custom.css" rel="stylesheet">
 <!--//Metis Menu -->
-</head>
-
-<body class="">
-</br>
-</br>
-</br>
-		<div class="login-body">
-			<div class="login-heading">
-				<h1>EVA-LOGIN</h1>
+</head> 
+<body class="cbp-spmenu-push">
+	<div class="main-content">
+		<!--left-fixed -navigation-->
+		<div class="sidebar" role="navigation">
+            <div class="navbar-collapse">
+				<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right dev-page-sidebar mCustomScrollbar _mCS_1 mCS-autoHide mCS_no_scrollbar" id="cbp-spmenu-s1">
+					<div class="scrollbar scrollbar1">
+						<!--#include file="inc\menuDireito.asp"-->
+					</div>
+					<!-- //sidebar-collapse -->
+				</nav>
 			</div>
-			<div class="panel panel-widget">
-				<div class="validation-grids validation-grids-right">
-					<div class="widget-shadow login-form-shadow" data-example-id="basic-forms"> 
-						<div class="form-body form-body-info">
-							<form data-toggle="validator" novalidate="true" name="form01" action="index.asp" method="post">
-								<div class="alert alert-danger" role="alert" id="msgErro" style="display:none">
-									
-							    </div>
-								<div class="form-group has-feedback">
-									<input type="text" class="form-control" name="login" id="login" placeholder="Login" data-error="Login inválido" required="">
-									<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-								</div>
-								<div class="form-group">
-									<input type="password" data-toggle="validator" data-minlength="6" name="senha" class="form-control" id="senha" placeholder="Senha" required="">
-								</div>
-								<div class="bottom">
-									<div class="form-group">
-										<div class="forgot">
-											<a href="#">Esqueceu a senha?</a>
+		</div>
+		<!--left-fixed -navigation-->
+		<!-- header-starts -->
+		<div class="sticky-header header-section ">
+			<!--#include file="inc\topo.asp"-->
+		</div>
+		<!-- //header-ends -->
+		<!-- main content start-->
+		<div id="page-wrapper">
+			<div class="main-page">
+					<!--grids-->
+				<div class="grids">
+					<div class="progressbar-heading grids-heading">
+						<h2>Cadastro de Usuário</h2>
+					</div>
+					<div class="forms-grids">
+						<div class="col-md-6">
+							<div class="panel panel-widget">
+								<div class="my-div">
+									<form method="post" class="valida"  id="form01" name="form01" action="cadUsuarioADM_02.asp">
+										<label for="nomeUsuario" >Nome:</label>
+										<div class="form-group" >
+											<input type="text" name="nomeUsuario" id="nomeUsuario" required="true" class="form-control"	/>
 										</div>
-									</div>
-									<div class="form-group">
-										<button type="submit" class="btn-primary">Entrar</button>
-									</div>
-									<div class="clearfix"></div>
+										<div class="row" >
+
+											<div class="col-xs-12 col-sm-5" >
+
+												<label for="field-1-2" >E-mail:</label>
+												<div class="form-group" >
+													<input type="text" name="email1" id="email1" filter="email" class="form-control" required="true"
+														data-invalid="Campo com e-mail inválido"  />
+												</div>
+
+											</div>
+
+											<div class="col-xs-12 col-sm-7" >
+
+												<label for="field-1-2" >Redigite o e-mail:</label>
+												<div class="form-group" >
+													<input type="text" name="email2" id="email2" filter="email|matches:email1" class="form-control" required="true"
+														data-invalid="E-mail inválido ou diferente do digitado"  />
+												</div>
+
+											</div>
+
+										</div>
+
+										<label for="field-1-3" >Login:</label>
+										<div class="form-group">
+										  <input type="text"  maxlength="30" class="form-control" id="login"  required="true"
+										   class="form-control" />
+										  <span class="help-block">Mínimo de 6 caracteres</span>
+										</div>
+										
+										<label for="senha" >Senha:</label>
+										<div class="form-group">
+										  <input type="password"  minlength="6" maxlength="20" class="form-control" id="senha" placeholder="Senha" required="true">
+										  <span class="help-block">Mínimo de 6 caracteres</span>
+										</div>
+										<div class="form-group">
+										  <input type="password" class="form-control" id="senha2" filter="password|matches:senha" data-invalid="Senha diferente do campo anterior" placeholder="Confirme a senha" required="true">
+										  <div class="help-block with-errors"></div>
+										</div>
+										<div class="form-group">
+											<div class="radio">
+												<label>
+													<input type="radio" name="sexo" required="true" value="M">
+													Masculino
+												</label>
+											</div>
+											<div class="radio">
+												<label>
+													<input type="radio" name="sexo" required="true" value="F">
+													Feminino
+												</label>
+											</div>
+										</div>
+										<hr >
+										<p>
+											<input type="submit" name="sub-1" value="Cadastrar" class="btn btn-primary" onclick="_inserir();"/>
+											<input type="reset" name="res-1" id="res-1" value="Limpar" class="btn btn-danger"  />
+										</p>
+									</form>
 								</div>
-							</form>
+							</div>
 						</div>
+						<div class="clearfix"> </div>
 					</div>
 				</div>
+				<!--//grids-->
 			</div>
-		<div class="copyright login-copyright">
-           <p>© EVA. All Rights Reserved.</p>    
 		</div>
+		<!--footer-->
+   	    <div class="dev-page">
+			<!-- page footer -->   
+			<!-- dev-page-footer-closed dev-page-footer-fixed -->
+			<!--#include file="inc\rodape.asp"-->
+            <!-- /page footer -->
+		</div>
+        <!--//footer-->
+	</div>
+	<!-- Classie -->
 		<script src="js/classie.js"></script>
 		<script>
 			var menuLeft = document.getElementById( 'cbp-spmenu-s1' ),
@@ -147,21 +198,23 @@ end if
 		<!-- input-forms -->
 		<script type="text/javascript" src="js/valida.2.1.6.min.js"></script>
 		<script type="text/javascript" >
-
+			function _inserir(){
+				//document.form01.submit();
+			}
+			
+			
 			$(document).ready(function() {
 
-				<%if bolLoginOK = false then%>		
-					document.getElementById("msgErro").innerHTML = "Login ou senha invalidos!";
-					document.getElementById("msgErro").style.display = "block";
-				<%else%>
-					document.getElementById("msgErro").style.display = "none";
-				<%end if%>
-				
+				/*desabilita o submit do form*/
+				  $("#form01").submit(function(){
+					return false; 
+				  });
+  
 				// show Valida's version.
 				$('#version').valida( 'version' );
 
 				// Exemple 1
-				//$('.valida').valida();
+				$('.valida').valida();
 
 				// Exemple 2
 				/*
@@ -209,6 +262,7 @@ end if
 		<!--validator js-->
 		<script src="js/validator.min.js"></script>
 		<!--//validator js-->
-			
+	
+		
 </body>
 </html>
