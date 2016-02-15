@@ -109,6 +109,7 @@
 										  <input type="text"  maxlength="30" name="login" minlength="6" class="form-control" id="login"   required="true"
 										   class="form-control" />
 										   <div id="MsgErroLogin"></div>
+										   <div id="MsgVerificaLogin"></div>
 										  <span class="help-block">Mínimo de 6 caracteres</span>
 										</div>
 										
@@ -143,7 +144,7 @@
 												<option value=""></option>
 												<%
 												'coclocar por perfil, se o usuario for adm traz todos, se nao traz somente o cliente logado
-												strSql = "select * from cliente cl, entidade en where cl.entidade_id = en.entidade_id and cl.situacao = 'A' "
+												strSql = "SELECT *  FROM [EVA].[dbo].[cliente] cl, [EVA].[dbo].[entidade] en where cl.entidade_id = en.entidade_id and cl.situacao = 'A';"
 												set objRS = server.createobject("adodb.recordset")
 												objRS.open strSql,conexao,3,3
 												if not objRS.eof then
@@ -167,7 +168,7 @@
 										</div>
 										<label for="perfil" >Perfil de acesso:</label>
 										<div class="form-group" id="perfilacesso" >
-											<select name="perfil" id="perfil" class="form-control" required="true">
+											<select name="perfil" id="perfil" class="form-control" required="true" multiple>
 												<option value=""></option>
 												<%
 												strSql = "select * from perfil p"
@@ -271,6 +272,7 @@
 							dataType: 'html',
 							data: dados,
 							success: function(data){
+								
 								$('#loja'). empty(). html(data);
 							}
 						});
@@ -278,6 +280,26 @@
 					//});
 					//$('form').trigger( 'submit' );
 				});
+				
+				$('#login').blur( function(){
+						var dados = $(this).serialize();
+						$.ajax({
+							url: 'verificaLoginExiste.asp?login=' + $('#login').val(),
+							type: 'POST',
+							dataType: 'html',
+							data: dados,
+							success: function(data){
+								//$('#loja'). empty(). html(data);
+								if (data != ''){
+									$("#MsgVerificaLogin").text(data);
+									$('#login').focus();
+								}else{
+									$("#MsgVerificaLogin").text("");
+								}
+							}
+						});
+				});
+				
 			});
 			
 			/*$(function()
