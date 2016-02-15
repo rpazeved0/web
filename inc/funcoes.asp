@@ -62,66 +62,73 @@ end function
 'strPermissao = permissao que o usuário tem 
 'Consultar,Incluir,Alterar,Deletar,Executar
 'S        ,S      ,S      ,S      ,S       
+'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar	
+'Consultar,Incluir,Alterar,Deletar,Executar
+'S        ,S      ,S      ,S      ,S       
+
 function BotaoForm(strExibir,strPermissao)
+	
+	permissaoUsuario = "S|S|S|S|S"
 	strBotoes = ""
 	if strExibir <> "" then
-		if inStr(strExibir,",") > 0 then
-			strExibir = split(strExibir,",")
+		if inStr(strExibir,"|") > 0 then
+			strExibir = split(strExibir,"|")
+			
 			for i = 0 to ubound(strExibir)
 				if strExibir(i) = "C" then
-					if ValidaExibicaoBotao(strPermissao,strExibir(i)) then
+					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
 						
 					end if
 				elseif strExibir(i) = "I" then
-					if ValidaExibicaoBotao(strPermissao,strExibir(i)) then
-						
+					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
+						strBotoes = strBotoes & "<input type='submit' name='cadastrar' value='Cadastrar' class='btn btn-primary'/>&nbsp;"
 					end if
 				elseif strExibir(i) = "A" then
-					if ValidaExibicaoBotao(strPermissao,strExibir(i)) then
+					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
 						
 					end if
 				elseif strExibir(i) = "D" then
-					if ValidaExibicaoBotao(strPermissao,strExibir(i)) then
+					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
 						
 					end if
 				elseif strExibir(i) = "E" then
-					if ValidaExibicaoBotao(strPermissao,strExibir(i)) then
+					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
 						
 					end if
 				elseif strExibir(i) = "L" then
-				
+					strBotoes = strBotoes & "<input type='reset' name='limpar' id='limpar' value='Limpar' class='btn btn-danger'/>&nbsp;"
 				end if
 			next
+			response.write strBotoes
 		else
 			BotaoForm = "Faltam parametros na string:strExibir"
 		end if
 	end if	
 end function
 
-function ValidaExibicaoBotao(strPermissao,strBotao)
+function ValidaExibicaoBotao(strPerm,strBotao)
 	ValidaExibicaoBotao = false
-	
-	if strPermissao <> "" then
-		strPermissao = split(strPermissao,",")
-		for i = 0 to ubound(strPermissao)
+	if strPerm <> "" then
+		strPerm = split(strPerm,"|")
+		for i = 0 to ubound(strPerm)
 			if strBotao = "C" then
-				if i = 0 and strPermissao(i) = "S"  then ValidaExibicaoBotao = true
+				if i = 0 and strPerm(i) = "S"  then ValidaExibicaoBotao = true
 			end if
 			if strBotao = "I" then
-				if i = 1 and strPermissao(i) = "S"  then ValidaExibicaoBotao = true
+				if i = 1 and strPerm(i) = "S"  then ValidaExibicaoBotao = true
 			end if
 			if strBotao = "A" then
-				if i = 2 and strPermissao(i) = "S"  then ValidaExibicaoBotao = true
+				if i = 2 and strPerm(i) = "S"  then ValidaExibicaoBotao = true
 			end if
 			if strBotao = "D" then
-				if i = 3 and strPermissao(i) = "S"  then ValidaExibicaoBotao = true
+				if i = 3 and strPerm(i) = "S"  then ValidaExibicaoBotao = true
 			end if
 			if strBotao = "E" then
-				if i = 4 and strPermissao(i) = "S"  then ValidaExibicaoBotao = true
+				if i = 4 and strPerm(i) = "S"  then ValidaExibicaoBotao = true
 			end if
 		next
 	end if
-end if
+end function
 
 
 %>

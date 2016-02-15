@@ -1,4 +1,6 @@
 <!DOCTYPE HTML>
+<!--#include file="inc\conexao.asp"-->
+<!--#include file="inc\funcoes.asp"-->
 <html>
 <head>
 <title>EVA ::Home </title>
@@ -32,6 +34,8 @@
 	</script>
 <!--//end-animate-->
 <!-- Metis Menu -->
+
+
 
 <!--//Metis Menu -->
 <!-- Metis Menu -->
@@ -102,18 +106,21 @@
 
 										<label for="field-1-3" >Login:</label>
 										<div class="form-group">
-										  <input type="text"  maxlength="30" class="form-control" id="login"  required="true"
+										  <input type="text"  maxlength="30" name="login" minlength="6" class="form-control" id="login"   required="true"
 										   class="form-control" />
+										   <div id="MsgErroLogin"></div>
 										  <span class="help-block">Mínimo de 6 caracteres</span>
 										</div>
 										
 										<label for="senha" >Senha:</label>
 										<div class="form-group">
-										  <input type="password"  minlength="6" maxlength="20" class="form-control" id="senha" placeholder="Senha" required="true">
+										  <input type="password"  maxlength="20" class="form-control" name="senha" id="senha" placeholder="Senha" required="true">
+										  <div id="MsgErroSenha"></div>
 										  <span class="help-block">Mínimo de 6 caracteres</span>
 										</div>
 										<div class="form-group">
-										  <input type="password" class="form-control" id="senha2" filter="password|matches:senha" data-invalid="Senha diferente do campo anterior" placeholder="Confirme a senha" required="true">
+										  <input type="password" class="form-control" maxlength="20" id="senha2" filter="password|matches:senha" data-invalid="Senha diferente do campo anterior" placeholder="Confirme a senha" required="true">
+										  <div id="MsgErroSenha2"></div>
 										  <div class="help-block with-errors"></div>
 										</div>
 										<div class="form-group">
@@ -130,10 +137,66 @@
 												</label>
 											</div>
 										</div>
+										<label for="empresa" >Empresa:</label>
+										<div class="form-group" >
+											<select name="empresa" id="empresa" class="form-control" >
+												<option value=""></option>
+												<%
+												'coclocar por perfil, se o usuario for adm traz todos, se nao traz somente o cliente logado
+												strSql = "select * from cliente cl, entidade en where cl.entidade_id = en.entidade_id and cl.situacao = 'A' "
+												set objRS = server.createobject("adodb.recordset")
+												objRS.open strSql,conexao,3,3
+												if not objRS.eof then
+													do while not objRS.eof
+													%>
+														<option value="<%=objRS("cliente_id")%>"><%=objRS("nome")%></option>
+													<%
+													objRS.movenext
+													loop
+												end if
+												objRS.close
+												set objRS = nothing
+												%>
+											</select>
+										</div>
+										<label for="loja" >Loja:</label>
+										<div class="form-group" id="loja" >
+											<select name="loja" id="loja" class="form-control" >
+												<option value=""></option>
+											</select>
+										</div>
+										<label for="perfil" >Perfil de acesso:</label>
+										<div class="form-group" id="perfilacesso" >
+											<select name="perfil" id="perfil" class="form-control" required="true">
+												<option value=""></option>
+												<%
+												strSql = "select * from perfil p"
+												set objRS = server.createobject("adodb.recordset")
+												objRS.open strSql,conexao,3,3
+												if not objRS.eof then
+													do while not objRS.eof
+													%>
+														<option value="<%=objRS("perfil_id")%>"><%=objRS("nome")%></option>
+													<%
+													objRS.movenext
+													loop
+												end if
+												objRS.close
+												set objRS = nothing
+												%>
+											</select>
+										</div>
 										<hr >
 										<p>
-											<input type="submit" name="sub-1" value="Cadastrar" class="btn btn-primary" onclick="_inserir();"/>
-											<input type="reset" name="res-1" id="res-1" value="Limpar" class="btn btn-danger"  />
+										
+										<%
+										'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar	
+										'Consultar,Incluir,Alterar,Deletar,Executar
+										'S        ,S      ,S      ,S      ,S       
+										strBotoesExibir = "N|I|N|N|N|L"		
+										strPermUsuario = "S|S|S|S|S"
+										call BotaoForm(strBotoesExibir,strPermUsuario)
+										%>
 										</p>
 									</form>
 								</div>
@@ -198,17 +261,67 @@
 		<!-- input-forms -->
 		<script type="text/javascript" src="js/valida.2.1.6.min.js"></script>
 		<script type="text/javascript" >
-			function _inserir(){
-				//document.form01.submit();
-			}
+			$(document).ready( function(){
+				$('#empresa').change( function(){
+					//$('form').submit( function(){
+						var dados = $(this).serialize();
+						$.ajax({
+							url: 'carregaLoja.asp?cliente_id=' + $('#empresa').val(),
+							type: 'POST',
+							dataType: 'html',
+							data: dados,
+							success: function(data){
+								$('#loja'). empty(). html(data);
+							}
+						});
+					//return false;
+					//});
+					//$('form').trigger( 'submit' );
+				});
+			});
+			
+			/*$(function()
+			{
+				$("form").submit(function()
+				{
+					alert('oi');
+					
+					if(combo == "ha")
+					{
+						return true;	// NÃO PREVINE o envio do formulário
+					}
+					else
+					{
+						return false;	// PREVINE o envio do formulário
+					}
+				});
+			});*/
+			
+			$('#login').blur(function(e){
+				if($('#login').val().length < 6){
+				   $('#login').focus()
+				   $("#MsgErroLogin").text("Campo de conter entre 6 a 30 caracteres.");
+				}else{
+					$("#MsgErroLogin").text("");
+				}
+			});
+			
+			$('#senha').blur(function(e){
+				if($('#senha').val().length < 6){
+				   $('#senha').focus()
+				   $("#MsgErroSenha").text("Campo de conter entre 6 a 20 caracteres.");
+				}else{
+					$("#MsgErroSenha").text("");
+				}
+			});
 			
 			
 			$(document).ready(function() {
-
+	
 				/*desabilita o submit do form*/
-				  $("#form01").submit(function(){
-					return false; 
-				  });
+				$("#form01").submit(function(){
+					return true; 
+				});
   
 				// show Valida's version.
 				$('#version').valida( 'version' );
@@ -251,8 +364,8 @@
 				$('#partial-1').on('click', function( ev ) {
 					ev.preventDefault();
 					$('#res-1').click(); // clear form error msgs
-					$('form').valida('partial', '#field-1'); // validate only field-1
-					$('form').valida('partial', '#field-1-3'); // validate only field-1-3
+					//$('form').valida('partial', '#field-1'); // validate only field-1
+					// 	$('form').valida('partial', '#field-1-3'); // validate only field-1-3
 				});
 
 			});
