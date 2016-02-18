@@ -10,15 +10,19 @@ intEmpresa = request("empresa")
 intLoja = request("loja")
 strPerfil = request("perfil")
 intTipoEntidade = 2 'Loja
-dtDataCastro = right("00"&month(date()),2) &"/"& right("00"&day(date()),2) &"/"& year(date()) &" "& right("00"&hour(Now),2) & ":" & right("00"&minute(Now),2) & ":" & right("00"&second(Now),2)
+dtDataCadastro = year(date()) &"-"& right("00"&month(date()),2) &"-"& right("00"&day(date()),2) &" "& right("00"&hour(Now),2) & ":" & right("00"&minute(Now),2) & ":" & right("00"&second(Now),2)
+'response.write dtDataCastro & "<br>"
 
 if intEmpresa = "" then	intEmpresa = "null"
 if intLoja = "" then intLoja = "null"
 
 'executar chamando um recordset
 'set objRs = server.createobject("adodb.recordset")
-strSql = "[eva].[dbo].sp_inclui_usuario '" & strNomeUsuario & "','" & strEmail & "','" & strLogin & "','" & strSenha & "','" & strSexo & "'," &  intEmpresa & "," & intLoja & "," & intTipoEntidade & ",'" & dtDataCastro & "','A'"
+strSql = "[eva].[dbo].sp_inclui_usuario '" & strNomeUsuario & "','" & strEmail & "','" & strLogin & "','" & strSenha & "','" & strSexo & "'," &  intEmpresa & "," & intLoja & "," & intTipoEntidade & ",'" & dtDataCadastro & "','A'"
 response.write strSql & "<br>"
+
+retorno = conexao.execute (strSql)
+response.write retorno
 
 'if not objRs.eof then
 '	intUsuarioId = objRs("usuario_id")
@@ -28,6 +32,7 @@ response.write strSql & "<br>"
 'objRS.Open strSql, conexao , 3,3
 'objRs.close
 'set objRs = nothing
+response.write objRs("usuario_id") & "<br>"
 
 strPerfil = split(strPerfil)
 response.write ubound(strPerfil)

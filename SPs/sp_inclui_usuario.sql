@@ -1,3 +1,4 @@
+USE [EVA]
 GO
 SET ANSI_NULLS ON
 GO
@@ -22,33 +23,31 @@ ALTER PROCEDURE [dbo].[sp_inclui_usuario]
 --@perfil_id int,
 @tipo_entidade_id int,
 @data_cadastro datetime,
-@situacao_usuario varchar(1),
-@usuario_id int OUTPUT
+@situacao_usuario varchar(1)
+--,@usuario_id int OUTPUT
 AS
 BEGIN
 			
-	begin transaction
-	
 	declare @entidade_id int
+	declare @usuario_id int
 	
 	insert into [EVA].[dbo].[entidade] (tipo_entidade_id,nome,email,sexo,data_cadastro) values (@tipo_entidade_id,@nome,@email,@sexo,@data_cadastro)
 	set @entidade_id =  @@IDENTITY
 	
 	insert into [EVA].[dbo].[usuario] (cliente_id,entidade_id,login,senha,situacao) values (@cliente_id,@entidade_id,@login,@senha,@situacao_usuario)
 	set @usuario_id =  @@IDENTITY
+	select @usuario_id as usuario_id
 	
-	insert into [EVA].[dbo].[loja_usuario] (usuario_id,loja_id) values (@usuario_id,@loja_id)
+	
+	if (@loja_id is not null)
+		insert into [EVA].[dbo].[loja_usuario] (usuario_id,loja_id) values (@usuario_id,@loja_id)
+	
 	
 	--insert into [EVA].[dbo].[perfil_usuario] (usuario_id,perfil_id) values (@usuario_id,@perfil_id)
 	
+	return @usuario_id
 	
-	IF (@@ERROR = 0)
-		begin
-			COMMIT
-		end	
-	ELSE
-		begin
-			ROLLBACK
-		end	
+
 END
+
 GO

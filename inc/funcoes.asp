@@ -129,6 +129,4 @@ function ValidaExibicaoBotao(strPerm,strBotao)
 		next
 	end if
 end function
-
-
 %>
