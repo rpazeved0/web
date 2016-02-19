@@ -1,3 +1,10 @@
+<!--#include file="conexao.asp"-->
+<!--#include file="funcoes.asp"-->
+<%
+if session("usuario_id") = "" then
+	response.redirect ("index.asp")
+end if
+%>
 <div class="header-left">
 	<!--logo -->
 	<div class="logo">

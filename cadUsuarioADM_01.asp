@@ -1,6 +1,4 @@
 <!DOCTYPE HTML>
-<!--#include file="inc\conexao.asp"-->
-<!--#include file="inc\funcoes.asp"-->
 <html>
 <head>
 <title>EVA ::Home </title>
@@ -76,6 +74,10 @@
 							<div class="panel panel-widget">
 								<div class="my-div">
 									<form method="post" class="valida"  id="form01" name="form01" action="cadUsuarioADM_02.asp">
+  									    <div class="" id="msg">
+											<%call msgRetornoSucesso()%>
+											<%call msgRetornoErro()%>
+										</div>
 										<label for="nomeUsuario" >Nome:</label>
 										<div class="form-group" >
 											<input type="text" name="nomeUsuario" id="nomeUsuario" required="true" class="form-control"	/>
@@ -117,14 +119,15 @@
 										<div class="form-group">
 										  <input type="password"  maxlength="20" class="form-control" name="senha" id="senha" placeholder="Senha" required="true">
 										  <div id="MsgErroSenha"></div>
-										  <span class="help-block">Mínimo de 6 caracteres</span>
+										  <span class="help-block">Mínimo de 8 caracteres</span>
+										  <table id="mostra"></table>
 										</div>
 										<div class="form-group">
 										  <input type="password" class="form-control" maxlength="20" id="senha2" filter="password|matches:senha" data-invalid="Senha diferente do campo anterior" placeholder="Confirme a senha" required="true">
 										  <div id="MsgErroSenha2"></div>
 										  <div class="help-block with-errors"></div>
 										</div>
-										<div class="form-group">
+										<!--div class="form-group">
 											<div class="radio">
 												<label>
 													<input type="radio" name="sexo" required="true" value="M">
@@ -137,7 +140,7 @@
 													Feminino
 												</label>
 											</div>
-										</div>
+										</div-->
 										<label for="empresa" >Empresa:</label>
 										<div class="form-group" >
 											<select name="empresa" id="empresa" class="form-control" >
@@ -262,6 +265,42 @@
 		<!-- input-forms -->
 		<script type="text/javascript" src="js/valida.2.1.6.min.js"></script>
 		<script type="text/javascript" >
+			function verificaForcaSenha(){
+				senha = document.getElementById("senha").value;
+				forca = 0;
+				mostra = document.getElementById("mostra");
+				if((senha.length >= 4) && (senha.length <= 7)){
+					forca += 10;
+				}else if(senha.length>7){
+					forca += 25;
+				}
+				if(senha.match(/[a-z]+/)){
+					forca += 10;
+				}
+				if(senha.match(/[A-Z]+/)){
+					forca += 20;
+				}
+				if(senha.match(/d+/)){
+					forca += 20;
+				}
+				if(senha.match(/W+/)){
+					forca += 25;
+				}
+				return mostra_res();
+			}
+			function mostra_res(){
+				if(forca < 30){
+					mostra.innerHTML = '<tr><td bgcolor="red" width="'+forca+'"></td><td>Fraca </td></tr>';
+				}else if((forca >= 30) && (forca < 60)){
+					mostra.innerHTML = '<tr><td bgcolor="yellow" width="'+forca+'"></td><td>Justa </td></tr>';;
+				}else if((forca >= 60) && (forca < 85)){
+					mostra.innerHTML = '<tr><td bgcolor="blue" width="'+forca+'"></td><td>Forte </td></tr>';
+				}else{
+					mostra.innerHTML = '<tr><td bgcolor="green" width="'+forca+'"></td><td>Excelente </td></tr>';
+				}
+			}
+		
+		
 			$(document).ready( function(){
 				$('#empresa').change( function(){
 					//$('form').submit( function(){
@@ -329,9 +368,9 @@
 			});
 			
 			$('#senha').blur(function(e){
-				if($('#senha').val().length < 6){
+				if($('#senha').val().length < 8){
 				   $('#senha').focus()
-				   $("#MsgErroSenha").text("Campo de conter entre 6 a 20 caracteres.");
+				   $("#MsgErroSenha").text("Campo de conter entre 8 a 20 caracteres.");
 				}else{
 					$("#MsgErroSenha").text("");
 				}

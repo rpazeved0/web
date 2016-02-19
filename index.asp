@@ -11,7 +11,7 @@ if strLogin <> "" then
 	'strsql = "update usuario set senha = '" & strSenha & "'"
 	'conexao.execute strsql
 	
-	strSQL = "select * from usuario usu where usu.login =  '" & strLogin & "' and usu.senha = '" & strSenha & "'"
+	strSQL = "select * from usuario usu where usu.login =  '" & strLogin & "' and usu.senha = '" & strSenha & "' and usu.situacao = 'A'"
 	set objRS = server.CreateObject("adodb.recordset")
 	objRS.open strSQL,conexao,3,3
 

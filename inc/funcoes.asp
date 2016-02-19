@@ -129,4 +129,31 @@ function ValidaExibicaoBotao(strPerm,strBotao)
 		next
 	end if
 end function
+
+function msgRetornoErro()
+	
+	if session("msgRetornoErro") <> "" then
+		strMsgErro = "<div class='alert alert-danger' role='alert' id='msgErro'>"
+		strMsgErro = strMsgErro & session("msgRetornoErro")
+		strMsgErro = strMsgErro & "</div> </br>"
+		response.write strMsgErro
+		session("msgRetornoErro")=""
+	end if
+
+end function
+
+function msgRetornoSucesso()
+	
+	if session("msgRetornoSucesso") <> "" then
+		strMsgSucesso = "<div class='alert alert-success' role='alert' id='msgSucesso'>"
+		strMsgSucesso = strMsgSucesso & session("msgRetornoSucesso")
+		strMsgSucesso = strMsgSucesso & "</div> </br>"
+		response.write strMsgSucesso
+		session("msgRetornoSucesso")=""
+	end if
+
+end function
+
+
+
 %>
