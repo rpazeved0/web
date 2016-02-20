@@ -68,7 +68,7 @@ end function
 
 function BotaoForm(strExibir,strPermissao)
 	
-	permissaoUsuario = "S|S|S|S|S"
+	permissaoUsuario = strPermissao
 	strBotoes = ""
 	if strExibir <> "" then
 		if inStr(strExibir,"|") > 0 then
@@ -153,7 +153,4 @@ function msgRetornoSucesso()
 	end if
 
 end function
-
-
-
 %>

@@ -14,16 +14,36 @@ if strLogin <> "" then
 	strSQL = "select * from usuario usu where usu.login =  '" & strLogin & "' and usu.senha = '" & strSenha & "' and usu.situacao = 'A'"
 	set objRS = server.CreateObject("adodb.recordset")
 	objRS.open strSQL,conexao,3,3
-
+	
 	if objRS.EOF then
 		bolLoginOK = false
 	else
 		bolLoginOK = true
 		session("usuario_id") = objRS("usuario_id")
+		
+		strSQL = "select * from perfil_usuario usu where usu.usuario_id = " & session("usuario_id")
+		set objRS = server.CreateObject("adodb.recordset")
+		objRS.open strSQL,conexao,3,3
+
+		strPerfil = ""
+		if not objRS.eof then
+			do while not objRS.eof
+				strPerfil = strPerfil & objRS("perfil_id") & "|" 
+				objRS.movenext
+			loop
+		end if
+
+		session("perfil") = strPerfil
+
+		objRS.close
+		set objRS = nothing
+		
 		response.redirect("index2.asp")
 	end if
 	objRS.close
 	set objRS = nothing
+	
+	
 end if
 %>
 <html>

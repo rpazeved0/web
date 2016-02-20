@@ -1,5 +1,5 @@
+<!--#include file="inc\verificaSession.asp"-->
 <!DOCTYPE HTML>
-
 <html>
 <head>
 <title>EVA ::Home </title>
@@ -73,7 +73,7 @@
 							</div>
 							<div class="grid-right">
 								<h3>Produtos</h3>
-								<p>452</p>
+								<p>65465</p>
 							</div>
 							<div class="clearfix"> </div>
 						</div>

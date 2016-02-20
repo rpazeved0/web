@@ -1,8 +1,8 @@
 <!--#include file="conexao.asp"-->
 <!--#include file="funcoes.asp"-->
 <%
-if session("usuario_id") = "" then
-	response.redirect ("index.asp")
+if request("strPermUsuario") <> "" then
+	session("PermUsuario") = request("strPermUsuario")
 end if
 %>
 <div class="header-left">

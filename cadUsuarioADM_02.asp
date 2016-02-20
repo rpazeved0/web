@@ -1,5 +1,6 @@
 <!--#include file="inc\conexao.asp"-->
 <!--#include file="inc\funcoes.asp"-->
+<!--#include file="inc\verificaSession.asp"-->
 <%
 on error resume next
 

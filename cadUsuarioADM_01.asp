@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+<!--#include file="inc\verificaSession.asp"-->
 <html>
 <head>
 <title>EVA ::Home </title>
@@ -70,7 +71,7 @@
 						<h2>Cadastro de Usuário</h2>
 					</div>
 					<div class="forms-grids">
-						<div class="col-md-6">
+						<div class="col-md-8">
 							<div class="panel panel-widget">
 								<div class="my-div">
 									<form method="post" class="valida"  id="form01" name="form01" action="cadUsuarioADM_02.asp">
@@ -147,13 +148,19 @@
 												<option value=""></option>
 												<%
 												'coclocar por perfil, se o usuario for adm traz todos, se nao traz somente o cliente logado
-												strSql = "SELECT *  FROM [EVA].[dbo].[cliente] cl, [EVA].[dbo].[entidade] en where cl.entidade_id = en.entidade_id and cl.situacao = 'A';"
+												strSql = "SELECT distinct en.nome nome_cliente, cl.cliente_id FROM [EVA].[dbo].[cliente] cl, [EVA].[dbo].[entidade] en, [EVA].[dbo].[loja_usuario] lu, [EVA].[dbo].[loja] lo where cl.entidade_id = en.entidade_id and cl.situacao = 'A' " & _
+														  "	and cl.cliente_id = lo.cliente_id  "
+												
+												if instr(session("perfil"),"1") = 0	then		
+													strSql = strSql & " and lu.usuario_id = " & session("usuario_id")
+												end if		  
+  
 												set objRS = server.createobject("adodb.recordset")
 												objRS.open strSql,conexao,3,3
 												if not objRS.eof then
 													do while not objRS.eof
 													%>
-														<option value="<%=objRS("cliente_id")%>"><%=objRS("nome")%></option>
+														<option value="<%=objRS("cliente_id")%>"><%=objRS("nome_cliente")%></option>
 													<%
 													objRS.movenext
 													loop
@@ -198,8 +205,7 @@
 										'Consultar,Incluir,Alterar,Deletar,Executar
 										'S        ,S      ,S      ,S      ,S       
 										strBotoesExibir = "N|I|N|N|N|L"		
-										strPermUsuario = "S|S|S|S|S"
-										call BotaoForm(strBotoesExibir,strPermUsuario)
+										call BotaoForm(strBotoesExibir,session("PermUsuario"))
 										%>
 										</p>
 									</form>
