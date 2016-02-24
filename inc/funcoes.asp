@@ -68,35 +68,39 @@ end function
 
 function BotaoForm(strExibir,strPermissao)
 	
-	permissaoUsuario = strPermissao
+	
 	strBotoes = ""
+	strPerm = ""
 	if strExibir <> "" then
 		if inStr(strExibir,"|") > 0 then
 			strExibir = split(strExibir,"|")
 			
 			for i = 0 to ubound(strExibir)
+				strPerm = strPermissao
 				if strExibir(i) = "C" then
-					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
-						
+					if ValidaExibicaoBotao(strPerm,strExibir(i)) then
+						strBotoes = strBotoes & "<input type='submit' name='consultar' id='consultar' value='Consultar' class='btn btn-primary'/>&nbsp;"
 					end if
 				elseif strExibir(i) = "I" then
-					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
-						strBotoes = strBotoes & "<input type='submit' name='cadastrar' value='Cadastrar' class='btn btn-primary'/>&nbsp;"
+					if ValidaExibicaoBotao(cstr(strPerm),strExibir(i)) then
+						strBotoes = strBotoes & "<input type='submit' name='cadastrar' id='cadastrar' value='Cadastrar' class='btn btn-primary'/>&nbsp;"
 					end if
 				elseif strExibir(i) = "A" then
-					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
+					if ValidaExibicaoBotao(strPerm,strExibir(i)) then
 						
 					end if
 				elseif strExibir(i) = "D" then
-					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
+					if ValidaExibicaoBotao(strPerm,strExibir(i)) then
 						
 					end if
 				elseif strExibir(i) = "E" then
-					if ValidaExibicaoBotao(permissaoUsuario,strExibir(i)) then
+					if ValidaExibicaoBotao(strPerm,strExibir(i)) then
 						
 					end if
 				elseif strExibir(i) = "L" then
 					strBotoes = strBotoes & "<input type='reset' name='limpar' id='limpar' value='Limpar' class='btn btn-danger'/>&nbsp;"
+				elseif strExibir(i) = "V" then
+					strBotoes = strBotoes & "<input type='reset' name='voltar' id='voltar' value='Voltar' class='btn btn-danger'/>&nbsp;"
 				end if
 			next
 			response.write strBotoes
@@ -149,8 +153,7 @@ function msgRetornoSucesso()
 		strMsgSucesso = strMsgSucesso & session("msgRetornoSucesso")
 		strMsgSucesso = strMsgSucesso & "</div> </br>"
 		response.write strMsgSucesso
-		session("msgRetornoSucesso")=""
 	end if
-
+	session("msgRetornoSucesso")=""
 end function
 %>

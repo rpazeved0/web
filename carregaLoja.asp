@@ -2,6 +2,7 @@
 <!--#include file="inc\funcoes.asp"-->
 <%
 intClienteID = request("cliente_id")
+strLinhaVazia = request("linhaVazia")
 
 if intClienteID <> "" then
 	strSql = "select lo.loja_id, en.nome from loja lo, entidade en where lo.entidade_id = en.entidade_id and lo.situacao = 'A' and lo.cliente_id = " & intClienteID
@@ -10,6 +11,11 @@ if intClienteID <> "" then
 	%>
 	<select name="loja" id="loja" class="form-control" >
 	<%
+		if strLinhaVazia <> "" then
+			%>
+			<option value=""></option>
+			<%
+		end if
 		if not objRS.eof then
 			do while not objRS.eof
 			%>
