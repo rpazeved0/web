@@ -1,0 +1,71 @@
+<script language=vbscript runat=server>
+
+
+
+SUB Application_OnStart
+	' Este evento é executado na primeira vez que uma página ASP é chamada dentro da aplicação.
+
+	' Define o tempo de inatividade de cada sessão
+	Session.Timeout=9999999999
+
+	' O método "Lock" bloqueia a variável Application para que possa ser atualizada Se não a bloquearmos, ela não será atualizada
+	'Application.Lock
+
+	'Application("Usuarios_Ativos") = 0
+
+	' Desbloqueamos a variável Application
+
+	'Application.UnLock
+END SUB
+
+
+
+SUB Application_OnEnd
+
+' Este evento é chamado quando a aplicação termina. Isto pode ser ocasionado
+
+' através da ocorrência de um tempo limite de inatividade ou a parada do web site.
+
+
+
+END SUB
+
+
+
+SUB Session_OnStart
+
+' Este evento é executado para cada usuário quando ele faz a primeira requisição de uma página na aplicação.
+' Toda vez que um usuário entrar no site, vamos incrementar a variável
+
+' "Usuarios_Ativos"
+
+'Application.Lock
+
+'Application("Usuarios_Ativos")=Application("Usuarios_Ativos")+1
+
+'Application.UnLock
+
+END SUB
+
+
+
+SUB Session_OnEnd
+
+' Este evento é chamado quando acaba a sessão de um usuário. Isto pode ser
+' ocasionado por um término explícito (método session.abandon) ou pela ocorrência de um tempo limite de inatividade da sessão. 
+' Quando um usuário abandona o site, decrementamos o valor da variável
+
+' "Usuarios_Ativos"
+
+'Application.Lock
+
+'Application("Usuarios_Ativos")=Application("Usuarios_Ativos")-1
+
+'Application.UnLock
+
+END SUB
+
+
+
+</script>
+

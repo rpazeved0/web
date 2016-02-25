@@ -98,6 +98,10 @@ if intEmpresa <> "" then
 	strSql = strSql & "	        and cl.cliente_id = " & intEmpresa
 end if
 
+strSql = strSql & " order by en.nome "
+'response.write session("PermUsuario")
+alterar = split(session("PermUsuario"),"|")(2)
+
 %>
 <html>
 <head>
@@ -200,16 +204,20 @@ end if
 											<div class="col-xs-12 col-sm-7" >
 												<%
 												if strSituacao = "A" then 
-													strSituacao = "Ativo" 
-												elseif strSituacao = "D" then
-													strSituacao = "Inativo" 
+													strSituacaoDesc = "Ativo" 
+												elseif strSituacao = "I" then
+													strSituacaoDesc = "Inativo" 
 												end if
 												%>
-												<label><b>Situacão:</b>&nbsp; <%=strSituacao%></label>
+												<label><b>Situacão:</b>&nbsp; <%=strSituacaoDesc%></label>
 											</div>
 										</div>
 										<hr >
 										<p>
+										<div class='alert alert-danger' role='alert' id='msgErro' style="display:none">
+										</div>
+										<div class='alert alert-success' role='alert' id='msgSucesso' style="display:none">
+										</div>
 										<div class="tables">
 											<table class="table"> 
 												<thead> 
@@ -219,33 +227,30 @@ end if
 														<th>Login</th>
 														<th>Data Cadastro</th>
 														<th>Situação</th>
+														<%if alterar = "S" then%>
 														<th></th>
+														<%end if%>
 													</tr>
 												</thead>
 												<tbody>
 													<%
-													'Definisse a quantidade de registros por pagina
+													'Define a quantidade de registros por pagina
 													registrosPagina = 10
-												
+													
 													'response.write strSql												
 													set objRs = server.createobject("adodb.recordset")
 													objRs.open strSql,conexao,1
 													
 													totalRegistros = objRs.recordCount ' Pega o total de registros
 													response.write "Total:" & objRs.recordCount 
-    
-												    totalRegistroPagina = totalRegistros/registrosPagina ' Calcula o total de registro por página
-													
+    											    totalRegistroPagina = totalRegistros/registrosPagina ' Calcula o total de registro por página
 												    If (Int(totalRegistroPagina)-totalRegistroPagina < 0) then ' Verifica se o valor é menor que 0
 														totalRegistroPagina = int(totalRegistroPagina) + 1
 												    End If
-													
 												    pagina = 1
-													
 												    If Request.QueryString("pagina")<>"" Then  'Pega a pagina para listar
 														pagina = CInt(Request.QueryString("pagina"))
 												    End If
-													 
 												    inicio = ( pagina - 1 ) * registrosPagina 'Defini o inicio da lista
 												    final = registrosPagina + inicio 'Define o final da lista
 												    contador = 0 'Seta variavel de Contador
@@ -256,18 +261,20 @@ end if
 															contador = contador + 1 'Contador
 															If contador>inicio Then
 															%>
-															<tr <%if objRs("usuario_id") mod 2 then %>class="info" <%end if%>>
+															<tr <%if contador mod 2 then %>class="info" <%end if%>>
 																<td><%=objRs("usuario_id")%></td>
 																<td><%=objRs("nome")%></td>
 																<td><%=objRs("login")%></td>
 																<td><%=objRs("data_cadastro")%></td>
 																<td>
-																	<select name="situacao" id="situacao" class="form-control" >
-																		<option value="A" <%if objRs("situacao") = "A" then response.write "selected"%>>Ativo</option>
-																		<option value="I" <%if objRs("situacao") = "I" then response.write "selected"%>>Inativo</option>
+																	<select name="situacaoUsuario" id="situacaoUsuario" class="form-control" onchange="javascript:atualizaSituacao(this.value);" >
+																		<option value="A|<%=objRs("usuario_id")%>" <%if objRs("situacao") = "A" then response.write "selected"%>>Ativo</option>
+																		<option value="I|<%=objRs("usuario_id")%>" <%if objRs("situacao") = "I" then response.write "selected"%>>Inativo</option>
 																	</select>
 																</td>
+																<%if alterar = "S" then%>
 																<td align="center"><button type="button" class="btn btn-info" onclick="javascript:alterar('<%=objRs("usuario_id")%>')">Alterar</button></td>
+																<%end if%>
 															</tr>
 															<%
 															end if
@@ -277,25 +284,27 @@ end if
 													objRs.close
 													set objRs = nothing
 													%>
+													<!--Paginação-->
 													<tr>
 														<td colspan="6" align="center">
 															<nav>
 															  <ul class="pagination">
-																<li class="<%if pagina = 1 then%>disabled<%end if%>"><a href="consUsuario_02.asp?pagina="<%=(pagina-1)%>" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>
+																<li class="<%if pagina = 1 then%>disabled<%end if%>"><a href="javascript:paginar('consUsuario_02.asp?pagina=<%=(pagina-1)%>','<%=(pagina-1)%>')" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>
 																<%
 																For i=1 to totalRegistroPagina
 																	If i=pagina Then
-																		response.Write "<li class='active'><a href=""consUsuario_02.asp?pagina="&i&"""> "&i&"<span class='sr-only'>(current)</span></a></li>"
+																		response.Write "<li class='active'><a href=javascript:paginar('consUsuario_02.asp?pagina="&i&"','" & pagina &"')> "&i&"<span class='sr-only'>(current)</span></a></li>"
 																	Else
-																		response.Write "<li><a href=""consUsuario_02.asp?pagina="&i&"""> "&i&" </a></li>"
+																		response.Write "<li><a href=javascript:paginar('consUsuario_02.asp?pagina="&i&"','" & pagina& "')> "&i&" </a></li>"
 																	End if
 																Next
 																%>
-																<%If totalRegistroPagina>pagina Then%><li><a href="consUsuario_02.asp?pagina=<%=(pagina+1)%>" aria-label="Next"><i class="fa fa-angle-right"></i></a></li><%end if%>
+																<%If totalRegistroPagina>pagina Then%><li><a href="javascript:paginar('consUsuario_02.asp?pagina=<%=(pagina+1)%>','<%=(pagina+1)%>')" aria-label="Next"><i class="fa fa-angle-right"></i></a></li><%end if%>
 															 </ul>
 														   </nav>
 														</td>
 													</tr>
+													<!--Paginação-->
 												</tbody>
 											</table> 
 											
@@ -309,6 +318,12 @@ end if
 										call BotaoForm(cstr(strBotoesExibir),cstr(session("PermUsuario")))
 										%>
 										</p>
+										<input type="hidden" name="nomeUsuario" value="<%=strNome%>">
+										<input type="hidden" name="login" value="<%=strLogin%>">
+										<input type="hidden" name="empresa" value="<%=intEmpresa%>">
+										<input type="hidden" name="loja" value="<%=intLoja%>">
+										<input type="hidden" name="perfil" value="<%=strPerfil%>">
+										<input type="hidden" name="situacao" value="<%=strSituacao%>">
 									</form>
 								</div>
 							</div>
@@ -350,7 +365,7 @@ end if
 			}
 			
 			function alterar(usuarioId){
-				document.form01.action = "cadUsuarioADM_01.asp?acao=A";
+				document.form01.action = "cadUsuarioADM_01.asp?acao=A&usuarioId=" + usuarioId;
 				document.form01.submit();
 			}
 		</script>
@@ -411,31 +426,44 @@ end if
 					mostra.innerHTML = '<tr><td bgcolor="green" width="'+forca+'"></td><td>Excelente </td></tr>';
 				}
 			}
-		
+			
+			function paginar(paginaSubmit,nuPagina){
+				if (nuPagina>0){
+					$('form').attr('action', paginaSubmit);
+					$('form').trigger( 'submit' );
+				}
+			}
+			
+			function atualizaSituacao(valor){
+				var dados = $(this).serialize();
+				$.ajax({
+					url: 'atualizaSituacaoUsuario.asp?situacaoNova=' + valor,
+					type: 'POST',
+					dataType: 'html',
+					data: dados,
+					success: function(data){
+						if (data != ''){
+							if (data == '0'){
+								$("#msgSucesso").text('Situação alterada com sucesso!');
+								$("#msgSucesso").show();
+								$("#msgErro").text('');
+								$("#msgErro").hide();
+							}else{
+								$("#msgErro").text('Erro ao atualizar a situação do usuário!');
+								$("#msgErro").show();
+								$("#msgSucesso").text('');
+								$("#msgSucesso").hide();
+							}
+						}else{
+							$("#msgErro").text("");
+							$("#msgSucesso").text("");
+						}
+					}
+				});
+			}
+			
 		
 			$(document).ready( function(){
-				$('#empresa').change( function(){
-					//$('form').submit( function(){
-						var dados = $(this).serialize();
-						$.ajax({
-							url: 'carregaLoja.asp?linhaVazia=S&cliente_id=' + $('#empresa').val(),
-							type: 'POST',
-							dataType: 'html',
-							data: dados,
-							success: function(data){
-								
-								$('#loja'). empty(). html(data);
-							}
-						});
-					//return false;
-					//});
-					//$('form').trigger( 'submit' );
-				});
-				
-				$('#consultar').click( function(){
-					$('form').attr('action', 'consUsuario_02.asp');
-					$('form').trigger( 'submit' );
-				});
 				
 				$('#cadastrar').click( function(){
 					$('form').attr('action', 'cadUsuarioADM_01.asp');
@@ -529,5 +557,8 @@ end if
 		<!--//validator js-->
 	
 		
+
+
+
 </body>
 </html>

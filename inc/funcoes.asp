@@ -87,15 +87,15 @@ function BotaoForm(strExibir,strPermissao)
 					end if
 				elseif strExibir(i) = "A" then
 					if ValidaExibicaoBotao(strPerm,strExibir(i)) then
-						
+						strBotoes = strBotoes & "<input type='submit' name='alterar' id='alterar' value='Alterar' class='btn btn-primary'/>&nbsp;"
 					end if
 				elseif strExibir(i) = "D" then
 					if ValidaExibicaoBotao(strPerm,strExibir(i)) then
-						
+						strBotoes = strBotoes & "<input type='submit' name='deletar' id='deletar' value='Deletar' class='btn btn-primary'/>&nbsp;"
 					end if
 				elseif strExibir(i) = "E" then
 					if ValidaExibicaoBotao(strPerm,strExibir(i)) then
-						
+						strBotoes = strBotoes & "<input type='submit' name='executar' id='executar' value='Executar' class='btn btn-primary'/>&nbsp;"
 					end if
 				elseif strExibir(i) = "L" then
 					strBotoes = strBotoes & "<input type='reset' name='limpar' id='limpar' value='Limpar' class='btn btn-danger'/>&nbsp;"

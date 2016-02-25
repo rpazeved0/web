@@ -1,6 +1,7 @@
 <!--#include file="conexao.asp"-->
 <!--#include file="funcoes.asp"-->
 <%
+
 if request("strPermUsuario") <> "" then
 	session("PermUsuario") = request("strPermUsuario")
 end if

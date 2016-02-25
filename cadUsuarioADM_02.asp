@@ -12,6 +12,7 @@ strSexo = request("sexo")
 intEmpresa = request("empresa")
 intLoja = request("loja")
 strPerfil = request("perfil")
+strSituacao = request("situacao")
 intTipoEntidade = 2 'Loja
 dtDataCadastro = year(date()) &"-"& right("00"&month(date()),2) &"-"& right("00"&day(date()),2) &" "& right("00"&hour(Now),2) & ":" & right("00"&minute(Now),2) & ":" & right("00"&second(Now),2)
 bolErro = false
@@ -51,7 +52,7 @@ if bolErro = false then
 	set objRs = nothing
 end if	
 
-strSql = "insert into [EVA].[dbo].[usuario] (cliente_id,entidade_id,login,senha,situacao) values (" & intEmpresa & ","& intUltimoIdEntidade &",'"& strLogin &"','"& strSenha &"','A')"
+strSql = "insert into [EVA].[dbo].[usuario] (cliente_id,entidade_id,login,senha,situacao) values (" & intEmpresa & ","& intUltimoIdEntidade &",'"& strLogin &"','"& strSenha &"','"& strSituacao &"')"
 conexao.execute(strSql)
 
 'response.write strSql & "<br>"

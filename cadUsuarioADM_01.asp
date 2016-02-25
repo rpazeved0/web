@@ -1,5 +1,64 @@
 <!DOCTYPE HTML>
 <!--#include file="inc\verificaSession.asp"-->
+<!--#include file="inc\conexao.asp"-->
+<%
+intUsuarioId = request("usuarioId")
+strAcao = request("acao")
+
+'response.write intUsuarioId
+'response.write strAcao
+if strAcao = "A" then
+	
+	strSql = " select enu.nome nome_usuario " & _
+	"	, enu.email " & _
+	"	, lu.loja_id " & _
+	"	, enl.nome nome_loja " & _
+	"	, cl.cliente_id " & _
+	"	, enc.nome nome_loja " & _
+	"	, us.login " & _
+	"	, us.senha " & _
+	"	, us.situacao " & _
+	" from  " & _
+	"	entidade enu inner join usuario us on enu.entidade_id = us.entidade_id " & _
+	"	left join loja_usuario lu on us.usuario_id = lu.usuario_id " & _
+	"	left join loja lo on lu.loja_id = lo.loja_id " & _
+	"	left join entidade enl on lo.entidade_id = enl.entidade_id " & _
+	"	left join cliente cl on lo.cliente_id = cl.cliente_id " & _
+	"	left join entidade enc on cl.entidade_id = enc.entidade_id " & _
+	"where us.usuario_id = " & intUsuarioId
+	
+	set objRs = server.createobject("adodb.recordset")
+	objRs.open strSql,conexao,3,3
+	if not objRs.eof then
+		strNomeUsuario = objRs("nome_usuario")
+		strEmail = objRs("email")
+		intLojaId = objRs("loja_id")
+		intClienteId = objRs("cliente_id")
+		strLogin = objRs("login")
+		strSenha = decripta(objRs("senha"))
+		strSituacao = objRs("situacao")
+	end if
+	objRs.close
+	set objRs = nothing
+	
+	if intUsuarioId <> "" then
+		strSql = "select * from perfil pe, perfil_usuario pu where pe.perfil_id = pu.perfil_id and pu.usuario_id = " & intUsuarioId
+		set objRs = server.createobject("adodb.recordset")
+		objRs.open strSql,conexao,3,3
+		if not objRs.eof then
+			do while not objRs.eof
+				strPerfil = strPerfil & objRs("perfil_id") & ","
+				objRs.movenext	
+			loop
+			strPerfil = left(strPerfil,len(strPerfil)-1)
+		end if
+		objRs.close
+		set objRs = nothing
+	end if
+ 
+
+end if
+%>
 <html>
 <head>
 <title>EVA ::Home </title>
@@ -68,7 +127,7 @@
 					<!--grids-->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>Cadastro de Usuário</h2>
+						<h2><%if strAcao = "A" then%>Alterar Usuário<%else%>Cadastro de Usuário<%end if%></h2>
 					</div>
 					<div class="forms-grids">
 						<div class="col-md-8">
@@ -81,7 +140,7 @@
 										</div>
 										<label for="nomeUsuario" >Nome:</label>
 										<div class="form-group" >
-											<input type="text" name="nomeUsuario" id="nomeUsuario" required="true" class="form-control"	/>
+											<input type="text" name="nomeUsuario" value="<%=strNomeUsuario%>" id="nomeUsuario" required="true" class="form-control"	/>
 										</div>
 										<div class="row" >
 
@@ -89,7 +148,7 @@
 
 												<label for="field-1-2" >E-mail:</label>
 												<div class="form-group" >
-													<input type="text" name="email1" id="email1" filter="email" class="form-control" required="true"
+													<input type="text" name="email1" id="email1" value="<%=strEmail%>" filter="email" class="form-control" required="true"
 														data-invalid="Campo com e-mail inválido"  />
 												</div>
 
@@ -99,7 +158,7 @@
 
 												<label for="field-1-2" >Redigite o e-mail:</label>
 												<div class="form-group" >
-													<input type="text" name="email2" id="email2" filter="email|matches:email1" class="form-control" required="true"
+													<input type="text" name="email2" id="email2" value="<%=strEmail%>" filter="email|matches:email1" class="form-control" required="true"
 														data-invalid="E-mail inválido ou diferente do digitado"  />
 												</div>
 
@@ -109,7 +168,7 @@
 
 										<label for="field-1-3" >Login:</label>
 										<div class="form-group">
-										  <input type="text"  maxlength="30" name="login" minlength="6" class="form-control" id="login"   required="true"
+										  <input type="text"  maxlength="30" name="login" minlength="6" value="<%=strLogin%>" class="form-control" id="login"   required="true"
 										   class="form-control" />
 										   <div id="MsgErroLogin"></div>
 										   <div id="MsgVerificaLogin"></div>
@@ -118,13 +177,13 @@
 										
 										<label for="senha" >Senha:</label>
 										<div class="form-group">
-										  <input type="password"  maxlength="20" class="form-control" name="senha" id="senha" placeholder="Senha" required="true">
+										  <input type="password"  maxlength="20" class="form-control" value="<%=strSenha%>" name="senha" id="senha" placeholder="Senha" required="true">
 										  <div id="MsgErroSenha"></div>
 										  <span class="help-block">Mínimo de 8 caracteres</span>
 										  <table id="mostra"></table>
 										</div>
 										<div class="form-group">
-										  <input type="password" class="form-control" maxlength="20" id="senha2" filter="password|matches:senha" data-invalid="Senha diferente do campo anterior" placeholder="Confirme a senha" required="true">
+										  <input type="password" class="form-control" maxlength="20" id="senha2" value="<%=strSenha%>" filter="password|matches:senha" data-invalid="Senha diferente do campo anterior" placeholder="Confirme a senha" required="true">
 										  <div id="MsgErroSenha2"></div>
 										  <div class="help-block with-errors"></div>
 										</div>
@@ -160,7 +219,7 @@
 												if not objRS.eof then
 													do while not objRS.eof
 													%>
-														<option value="<%=objRS("cliente_id")%>"><%=objRS("nome_cliente")%></option>
+														<option <%if intClienteId = objRS("cliente_id") then %>selected<%end if%> value="<%=objRS("cliente_id")%>"><%=objRS("nome_cliente")%></option>
 													<%
 													objRS.movenext
 													loop
@@ -176,6 +235,13 @@
 												<option value=""></option>
 											</select>
 										</div>
+										<label for="loja" >Situação:</label>
+										<div class="form-group" id="situacao" >
+											<select name="situacao" id="situacao" class="form-control" >
+												<option value="A" <%if strSituacao = "A" then%>selected<%end if%> >Ativo</option>
+												<option value="I" <%if strSituacao = "I" then%>selected<%end if%> >Inativo</option>
+											</select>
+										</div>
 										<label for="perfil" >Perfil de acesso:</label>
 										<div class="form-group" id="perfilacesso" >
 											<select name="perfil" id="perfil" class="form-control" required="true" multiple>
@@ -187,7 +253,7 @@
 												if not objRS.eof then
 													do while not objRS.eof
 													%>
-														<option value="<%=objRS("perfil_id")%>"><%=objRS("nome")%></option>
+														<option <%if instr(strPerfil,objRS("perfil_id")) > 0 then%>selected<%end if%> value="<%=objRS("perfil_id")%>"><%=objRS("nome")%></option>
 													<%
 													objRS.movenext
 													loop
@@ -204,10 +270,16 @@
 										'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar,Voltar
 										'Consultar,Incluir,Alterar,Deletar,Executar
 										'S        ,S      ,S      ,S      ,S       
-										strBotoesExibir = "N|I|N|N|N|L|V"		
+										if strAcao = "A" then
+											strBotoesExibir = "N|N|A|N|N|N|V"		
+										else
+											strBotoesExibir = "N|I|N|N|N|L|V"		
+										end if										
 										call BotaoForm(strBotoesExibir,session("PermUsuario"))
 										%>
 										</p>
+										<input type="hidden" name="acao" value="<%=strAcao%>">
+										<input type="hidden" name="usuario_id" value="<%=intUsuarioId%>">
 									</form>
 								</div>
 							</div>
@@ -312,7 +384,7 @@
 					//$('form').submit( function(){
 						var dados = $(this).serialize();
 						$.ajax({
-							url: 'carregaLoja.asp?cliente_id=' + $('#empresa').val(),
+							url: 'carregaLoja.asp?loja_id=<%=intLojaId%>&cliente_id=' + $('#empresa').val(),
 							type: 'POST',
 							dataType: 'html',
 							data: dados,
@@ -325,6 +397,21 @@
 					//});
 					//$('form').trigger( 'submit' );
 				});
+				
+				<%if intClienteId <> "" then%>
+				var dados = $(this).serialize();
+				$.ajax({
+					url: 'carregaLoja.asp?loja_id=<%=intLojaId%>&cliente_id=<%=intClienteId%>',
+					type: 'POST',
+					dataType: 'html',
+					data: dados,
+					success: function(data){
+						
+						$('#loja'). empty(). html(data);
+					}
+				});
+				<%end if%>
+				
 				
 				$('#login').blur( function(){
 						var dados = $(this).serialize();

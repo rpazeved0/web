@@ -68,7 +68,7 @@
 					<!--grids-->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>Consulta Usuário</h2>
+						<h2>Usuário</h2>
 					</div>
 					<div class="forms-grids">
 						<div class="col-md-12">
