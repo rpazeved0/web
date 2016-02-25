@@ -124,6 +124,14 @@
 												<option value=""></option>
 											</select>
 										</div>
+										<label for="loja" >Situação:</label>
+										<div class="form-group" id="loja" >
+											<select name="situacao" id="situacao" class="form-control" >
+												<option value=""></option>
+												<option value="A">Ativo</option>
+												<option value="I">Inativo</option>
+											</select>
+										</div>
 										<label for="perfil" >Perfil de acesso:</label>
 										<div class="form-group" id="perfilacesso" >
 											<select name="perfil" id="perfil" class="form-control" multiple>
@@ -144,7 +152,9 @@
 												set objRS = nothing
 												%>
 											</select>
+											
 										</div>
+										
 										<hr >
 										<p>
 

@@ -7,6 +7,7 @@ strLogin = request("login")
 intEmpresa = request("empresa")
 intLoja = request("loja")
 strPerfil = request("perfil")
+strSituacao = request("situacao")
 strNomeEmpresa = ""
 strNomeLoja = ""
 strNomePerfil = ""
@@ -48,25 +49,54 @@ if strPerfil <> "" then
 	set objRs = nothing
 end if
 
+strSql = ""
+strSql = strSql & " select distinct en.nome, us.login, en.data_cadastro, us.situacao, us.usuario_id from "
+strSql = strSql & "       	usuario us "
+strSql = strSql & "	        ,entidade en  "
 
-'select en.nome, us.login, en.data_cadastro from 
-'	usuario us
-'	,entidade en 
-'	,loja_usuario lu
-'	,cliente cl
-'	,loja lo
-'where 
-'	us.entidade_id = en.entidade_id 
-'	and us.usuario_id = lu.usuario_id
-'	and lu.loja_id = lo.loja_id
-'	and lo.cliente_id = cl.cliente_id
-'	and en.nome like '%sidnei%'
-'	and lu.loja_id = 1
-'	and cl.cliente_id = 2
+if intLoja <> "" then
+	strSql = strSql & "	        ,loja_usuario lu "
+	strSql = strSql & "	        ,loja lo "
+end if
 
+if intEmpresa <> "" then
+	strSql = strSql & "	        ,cliente cl "
+	if intLoja = "" then
+		strSql = strSql & "     ,loja lo "
+	end if
+end if
 
+strSql = strSql & " where "
+strSql = strSql & "	        us.entidade_id = en.entidade_id "
 
+if intLoja <> "" then
+	strSql = strSql & "	        and us.usuario_id = lu.usuario_id "
+	strSql = strSql & "	        and lu.loja_id = lo.loja_id "
+end if
 
+if intEmpresa <> "" then
+	strSql = strSql & "	        and lo.cliente_id = cl.cliente_id "
+end if
+
+if strNome <> "" then
+	strSql = strSql & "	        and upper(en.nome) like upper('%" &  strNome & "%') "
+end if
+
+if strLogin <> "" then
+	strSql = strSql & "	        and upper(us.login)  = upper('" &  strLogin & "') "
+end if	
+
+if intLoja <> "" then
+	strSql = strSql & "	        and lu.loja_id = " & intLoja
+end if
+
+if strSituacao <> "" then
+	strSql = strSql & "	        and us.situacao = '" &  strSituacao & "'"
+end if
+
+if intEmpresa <> "" then
+	strSql = strSql & "	        and cl.cliente_id = " & intEmpresa
+end if
 
 %>
 <html>
@@ -144,40 +174,133 @@ end if
 							<div class="panel panel-widget">
 								<div class="my-div">
 									<form method="post" class="valida"  id="form01" name="form01" action="">
-										<label><b>Nome:</b>&nbsp; <%=strNome%></label>
-										</br>
-										<label><b>Login:</b>&nbsp; <%=strLogin%></label>
-										<label><b>Empresa:</b>&nbsp; <%=strNomeEmpresa%></label>
-										</br>
-										<label><b>Loja:</b>&nbsp; <%=strNomeLoja%></label>
-										
-										<label><b>Perfil de acesso:</b>&nbsp; <%=strNomePerfil%></label>
-										</b>
+										<div class="row" >
+											<div class="col-xs-12 col-sm-5" >
+												<label><b>Nome:</b>&nbsp; <%=strNome%></label>
+											</div>
+
+											<div class="col-xs-12 col-sm-7" >
+												<label><b>Login:</b>&nbsp; <%=strLogin%></label>
+											</div>
+										</div>
+										<div class="row" >
+											<div class="col-xs-12 col-sm-5" >
+												<label><b>Empresa:</b>&nbsp; <%=strNomeEmpresa%></label>
+											</div>
+
+											<div class="col-xs-12 col-sm-7" >
+												<label><b>Loja:</b>&nbsp; <%=strNomeLoja%></label>
+											</div>
+										</div>
+										<div class="row" >
+											<div class="col-xs-12 col-sm-5" >
+												<label><b>Perfil de acesso:</b>&nbsp; <%=strNomePerfil%></label>
+											</div>
+
+											<div class="col-xs-12 col-sm-7" >
+												<%
+												if strSituacao = "A" then 
+													strSituacao = "Ativo" 
+												elseif strSituacao = "D" then
+													strSituacao = "Inativo" 
+												end if
+												%>
+												<label><b>Situacão:</b>&nbsp; <%=strSituacao%></label>
+											</div>
+										</div>
 										<hr >
 										<p>
 										<div class="tables">
 											<table class="table"> 
 												<thead> 
 													<tr>
+														<th>#</th>
 														<th>Nome</th>
 														<th>Login</th>
 														<th>Data Cadastro</th>
+														<th>Situação</th>
+														<th></th>
 													</tr>
 												</thead>
 												<tbody>
-													<tr class="info">
-														<td>Column content</td>
-														<td>Column content</td>
-														<td>Column content</td>
-													</tr>
+													<%
+													'Definisse a quantidade de registros por pagina
+													registrosPagina = 10
+												
+													'response.write strSql												
+													set objRs = server.createobject("adodb.recordset")
+													objRs.open strSql,conexao,1
+													
+													totalRegistros = objRs.recordCount ' Pega o total de registros
+													response.write "Total:" & objRs.recordCount 
+    
+												    totalRegistroPagina = totalRegistros/registrosPagina ' Calcula o total de registro por página
+													
+												    If (Int(totalRegistroPagina)-totalRegistroPagina < 0) then ' Verifica se o valor é menor que 0
+														totalRegistroPagina = int(totalRegistroPagina) + 1
+												    End If
+													
+												    pagina = 1
+													
+												    If Request.QueryString("pagina")<>"" Then  'Pega a pagina para listar
+														pagina = CInt(Request.QueryString("pagina"))
+												    End If
+													 
+												    inicio = ( pagina - 1 ) * registrosPagina 'Defini o inicio da lista
+												    final = registrosPagina + inicio 'Define o final da lista
+												    contador = 0 'Seta variavel de Contador
+													
+													
+													if not objRs.eof then
+														do while not objRs.eof and contador<final
+															contador = contador + 1 'Contador
+															If contador>inicio Then
+															%>
+															<tr <%if objRs("usuario_id") mod 2 then %>class="info" <%end if%>>
+																<td><%=objRs("usuario_id")%></td>
+																<td><%=objRs("nome")%></td>
+																<td><%=objRs("login")%></td>
+																<td><%=objRs("data_cadastro")%></td>
+																<td>
+																	<select name="situacao" id="situacao" class="form-control" >
+																		<option value="A" <%if objRs("situacao") = "A" then response.write "selected"%>>Ativo</option>
+																		<option value="I" <%if objRs("situacao") = "I" then response.write "selected"%>>Inativo</option>
+																	</select>
+																</td>
+																<td align="center"><button type="button" class="btn btn-info" onclick="javascript:alterar('<%=objRs("usuario_id")%>')">Alterar</button></td>
+															</tr>
+															<%
+															end if
+															objRs.movenext
+														loop
+													end if
+													objRs.close
+													set objRs = nothing
+													%>
 													<tr>
-														<td>Column content</td>
-														<td>Column content</td>
-														<td>Column content</td>
+														<td colspan="6" align="center">
+															<nav>
+															  <ul class="pagination">
+																<li class="<%if pagina = 1 then%>disabled<%end if%>"><a href="consUsuario_02.asp?pagina="<%=(pagina-1)%>" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>
+																<%
+																For i=1 to totalRegistroPagina
+																	If i=pagina Then
+																		response.Write "<li class='active'><a href=""consUsuario_02.asp?pagina="&i&"""> "&i&"<span class='sr-only'>(current)</span></a></li>"
+																	Else
+																		response.Write "<li><a href=""consUsuario_02.asp?pagina="&i&"""> "&i&" </a></li>"
+																	End if
+																Next
+																%>
+																<%If totalRegistroPagina>pagina Then%><li><a href="consUsuario_02.asp?pagina=<%=(pagina+1)%>" aria-label="Next"><i class="fa fa-angle-right"></i></a></li><%end if%>
+															 </ul>
+														   </nav>
+														</td>
 													</tr>
 												</tbody>
 											</table> 
+											
 										</div>
+										
 										<%
 										'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar	
 										'Consultar,Incluir,Alterar,Deletar,Executar
@@ -224,6 +347,11 @@ end if
 				if( button !== 'showLeftPush' ) {
 					classie.toggle( showLeftPush, 'disabled' );
 				}
+			}
+			
+			function alterar(usuarioId){
+				document.form01.action = "cadUsuarioADM_01.asp?acao=A";
+				document.form01.submit();
 			}
 		</script>
 	<!-- Bootstrap Core JavaScript --> 
@@ -315,8 +443,8 @@ end if
 				});
 				
 				$('#voltar').click( function(){
-					parent.history.back();
-					return false;
+					$('form').attr('action', 'consUsuario_01.asp');
+					$('form').trigger( 'submit' );
 				});
 				
 				
