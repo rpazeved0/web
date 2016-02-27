@@ -18,6 +18,7 @@ if strAcao = "A" then
 	"	, us.login " & _
 	"	, us.senha " & _
 	"	, us.situacao " & _
+	"	, us.entidade_id " & _
 	" from  " & _
 	"	entidade enu inner join usuario us on enu.entidade_id = us.entidade_id " & _
 	"	left join loja_usuario lu on us.usuario_id = lu.usuario_id " & _
@@ -37,6 +38,7 @@ if strAcao = "A" then
 		strLogin = objRs("login")
 		strSenha = decripta(objRs("senha"))
 		strSituacao = objRs("situacao")
+		intEntidadeId = objRs("entidade_id")
 	end if
 	objRs.close
 	set objRs = nothing
@@ -54,6 +56,8 @@ if strAcao = "A" then
 		end if
 		objRs.close
 		set objRs = nothing
+		
+		
 	end if
  
 
@@ -279,6 +283,8 @@ end if
 										%>
 										</p>
 										<input type="hidden" name="acao" value="<%=strAcao%>">
+										<input type="hidden" name="entidade_id" value="<%=intEntidadeId%>">
+										
 										<input type="hidden" name="usuario_id" value="<%=intUsuarioId%>">
 									</form>
 								</div>
@@ -413,7 +419,7 @@ end if
 				<%end if%>
 				
 				
-				$('#login').blur( function(){
+				$('#login').change( function(){
 						var dados = $(this).serialize();
 						$.ajax({
 							url: 'verificaLoginExiste.asp?login=' + $('#login').val(),
@@ -424,7 +430,7 @@ end if
 								//$('#loja'). empty(). html(data);
 								if (data != ''){
 									$("#MsgVerificaLogin").text(data);
-									$('#login').focus();
+									$('#login').val("");
 								}else{
 									$("#MsgVerificaLogin").text("");
 								}
@@ -432,9 +438,10 @@ end if
 						});
 				});
 				
+				
 				$('#voltar').click( function(){
-					parent.history.back();
-					return false;
+					$('form').attr('action', 'consUsuario_01.asp');
+					$('form').trigger( 'submit' );
 				});
 				
 			});
