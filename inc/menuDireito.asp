@@ -80,11 +80,12 @@ objRS.open strSqlModulo,conexao,3,3
 					if not objRSFunc.eof then
 						do while not objRSFunc.eof
 							'strUrlFuncao = objRSFunc("url_funcao") & "?strPermUsuario=" & objRSFunc("consultar") &"|"& objRSFunc("inserir") &"|"& objRSFunc("atualizar") &"|"& objRSFunc("deletar") &"|"& objRSFunc("executar")
-							strUrlFuncao = objRSFunc("url_funcao") 
+							
+							strUrlFuncao =  objRSFunc("url_funcao") 
 							strPermUsuario = objRSFunc("consultar") &"|"& objRSFunc("inserir") &"|"& objRSFunc("atualizar") &"|"& objRSFunc("deletar") &"|"& objRSFunc("executar")
 							%>
 							<li>
-								<a href="javascript:enviaFormaPerm('<%=strUrlFuncao%>','<%=strPermUsuario%>');"><%=objRSFunc("nome_funcao")%></a>
+								<a href="javascript:enviaFormaPerm('<%=getSiteURL()&strUrlFuncao%>','<%=strPermUsuario%>');"><%=objRSFunc("nome_funcao")& Application("site")%></a>
 							</li>
 							<%
 							objRSFunc.movenext

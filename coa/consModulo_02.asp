@@ -1,105 +1,25 @@
 <!DOCTYPE HTML>
-<!--#include file="inc\verificaSession.asp"-->
-<!--#include file="inc\conexao.asp"-->
+<!--#include file="..\inc\verificaSession.asp"-->
+<!--#include file="..\inc\conexao.asp"-->
 <%
-strNome = request("nomeUsuario")
-strLogin = request("login")
-intEmpresa = request("empresa")
-intLoja = request("loja")
-strPerfil = request("perfil")
+strNome = request("nome")
 strSituacao = request("situacao")
-strNomeEmpresa = ""
-strNomeLoja = ""
-strNomePerfil = ""
-
-if intEmpresa <> "" then
-	strSql = "select en.nome from cliente cl, entidade en where cl.entidade_id = en.entidade_id and cl.cliente_id = " & intEmpresa
-	set objRs = server.createobject("adodb.recordset")
-	objRs.open strSql,conexao,3,3
-	if not objRs.eof then
-		strNomeEmpresa = objRs("nome")
-	end if
-	objRs.close
-	set objRs = nothing
-end if
-
-if intLoja <> "" then
-	strSql = "select en.nome from loja lo, entidade en where lo.entidade_id = en.entidade_id and lo.loja_id = " & intLoja
-	set objRs = server.createobject("adodb.recordset")
-	objRs.open strSql,conexao,3,3
-	if not objRs.eof then
-		strNomeLoja = objRs("nome")
-	end if
-	objRs.close
-	set objRs = nothing
-end if
-
-if strPerfil <> "" then
-	strSql = "select * from perfil pe where pe.perfil_id in (" & strPerfil & ")"
-	set objRs = server.createobject("adodb.recordset")
-	objRs.open strSql,conexao,3,3
-	if not objRs.eof then
-		do while not objRs.eof
-			strNomePerfil = strNomePerfil & objRs("nome") & ","
-			objRs.movenext	
-		loop
-		strNomePerfil = left(strNomePerfil,len(strNomePerfil)-1)
-	end if
-	objRs.close
-	set objRs = nothing
-end if
 
 strSql = ""
-strSql = strSql & " select distinct en.nome, us.login, en.data_cadastro, us.situacao, us.usuario_id from "
-strSql = strSql & "       	usuario us "
-strSql = strSql & "	        ,entidade en  "
-
-if intLoja <> "" then
-	strSql = strSql & "	        ,loja_usuario lu "
-	strSql = strSql & "	        ,loja lo "
-end if
-
-if intEmpresa <> "" then
-	strSql = strSql & "	        ,cliente cl "
-	if intLoja = "" then
-		strSql = strSql & "     ,loja lo "
-	end if
-end if
-
-strSql = strSql & " where "
-strSql = strSql & "	        us.entidade_id = en.entidade_id "
-
-if intLoja <> "" then
-	strSql = strSql & "	        and us.usuario_id = lu.usuario_id "
-	strSql = strSql & "	        and lu.loja_id = lo.loja_id "
-end if
-
-if intEmpresa <> "" then
-	strSql = strSql & "	        and lo.cliente_id = cl.cliente_id "
-end if
+strSql = strSql & " select * from "
+strSql = strSql & "       	modulo mo "
+strSql = strSql & " where 1=1 "
 
 if strNome <> "" then
-	strSql = strSql & "	        and upper(en.nome) like upper('%" &  strNome & "%') "
-end if
-
-if strLogin <> "" then
-	strSql = strSql & "	        and upper(us.login)  = upper('" &  strLogin & "') "
-end if	
-
-if intLoja <> "" then
-	strSql = strSql & "	        and lu.loja_id = " & intLoja
+	strSql = strSql & "	 and upper(mo.nome) like upper('%" &  strNome & "%') "
 end if
 
 if strSituacao <> "" then
-	strSql = strSql & "	        and us.situacao = '" &  strSituacao & "'"
+	strSql = strSql & "	  and mo.situacao = '" &  strSituacao & "'"
 end if
 
-if intEmpresa <> "" then
-	strSql = strSql & "	        and cl.cliente_id = " & intEmpresa
-end if
+strSql = strSql & " order by mo.nome "
 
-strSql = strSql & " order by en.nome "
-'response.write session("PermUsuario")
 alterar = split(session("PermUsuario"),"|")(2)
 
 %>
@@ -111,26 +31,26 @@ alterar = split(session("PermUsuario"),"|")(2)
 <meta name="keywords" content="" />
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
 <!-- Bootstrap Core CSS -->
-<link href="css/bootstrap.css" rel='stylesheet' type='text/css' />
+<link href="../css/bootstrap.css" rel='stylesheet' type='text/css' />
 <!-- Custom CSS -->
-<link href="css/style.css" rel='stylesheet' type='text/css' />
+<link href="../css/style.css" rel='stylesheet' type='text/css' />
 <!-- font CSS -->
 <link rel="icon" href="favicon.ico" type="image/x-icon" >
 <!-- font-awesome icons -->
-<link href="css/font-awesome.css" rel="stylesheet"> 
+<link href="../css/font-awesome.css" rel="stylesheet"> 
 <!-- //font-awesome icons -->
 <!-- chart -->
-<script src="js/Chart.js"></script>
+<script src="../js/Chart.js"></script>
 <!-- //chart -->
  <!-- js-->
-<script src="js/jquery-1.11.1.min.js"></script>
-<script src="js/modernizr.custom.js"></script>
+<script src="../js/jquery-1.11.1.min.js"></script>
+<script src="../js/modernizr.custom.js"></script>
 <!--webfonts-->
 <link href='//fonts.googleapis.com/css?family=Roboto+Condensed:400,300,300italic,400italic,700,700italic' rel='stylesheet' type='text/css'>
 <!--//webfonts--> 
 <!--animate-->
-<link href="css/animate.css" rel="stylesheet" type="text/css" media="all">
-<script src="js/wow.min.js"></script>
+<link href="../css/animate.css" rel="stylesheet" type="text/css" media="all">
+<script src="../js/wow.min.js"></script>
 	<script>
 		 new WOW().init();
 	</script>
@@ -141,9 +61,9 @@ alterar = split(session("PermUsuario"),"|")(2)
 
 <!--//Metis Menu -->
 <!-- Metis Menu -->
-<script src="js/metisMenu.min.js"></script>
-<script src="js/custom.js"></script>
-<link href="css/custom.css" rel="stylesheet">
+<script src="../js/metisMenu.min.js"></script>
+<script src="../js/custom.js"></script>
+<link href="../css/custom.css" rel="stylesheet">
 <!--//Metis Menu -->
 </head> 
 <body class="cbp-spmenu-push">
@@ -153,7 +73,7 @@ alterar = split(session("PermUsuario"),"|")(2)
             <div class="navbar-collapse">
 				<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right dev-page-sidebar mCustomScrollbar _mCS_1 mCS-autoHide mCS_no_scrollbar" id="cbp-spmenu-s1">
 					<div class="scrollbar scrollbar1">
-						<!--#include file="inc\menuDireito.asp"-->
+						<!--#include file="..\inc\menuDireito.asp"-->
 					</div>
 					<!-- //sidebar-collapse -->
 				</nav>
@@ -162,7 +82,7 @@ alterar = split(session("PermUsuario"),"|")(2)
 		<!--left-fixed -navigation-->
 		<!-- header-starts -->
 		<div class="sticky-header header-section ">
-			<!--#include file="inc\topo.asp"-->
+			<!--#include file="..\inc\topo.asp"-->
 		</div>
 		<!-- //header-ends -->
 		<!-- main content start-->
@@ -171,7 +91,7 @@ alterar = split(session("PermUsuario"),"|")(2)
 					<!--grids-->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>Consulta Usuário</h2>
+						<h2>Consulta M&oacute;dulo</h2>
 					</div>
 					<div class="forms-grids">
 						<div class="col-md-12">
@@ -181,24 +101,6 @@ alterar = split(session("PermUsuario"),"|")(2)
 										<div class="row" >
 											<div class="col-xs-12 col-sm-5" >
 												<label><b>Nome:</b>&nbsp; <%=strNome%></label>
-											</div>
-
-											<div class="col-xs-12 col-sm-7" >
-												<label><b>Login:</b>&nbsp; <%=strLogin%></label>
-											</div>
-										</div>
-										<div class="row" >
-											<div class="col-xs-12 col-sm-5" >
-												<label><b>Empresa:</b>&nbsp; <%=strNomeEmpresa%></label>
-											</div>
-
-											<div class="col-xs-12 col-sm-7" >
-												<label><b>Loja:</b>&nbsp; <%=strNomeLoja%></label>
-											</div>
-										</div>
-										<div class="row" >
-											<div class="col-xs-12 col-sm-5" >
-												<label><b>Perfil de acesso:</b>&nbsp; <%=strNomePerfil%></label>
 											</div>
 
 											<div class="col-xs-12 col-sm-7" >
@@ -224,8 +126,8 @@ alterar = split(session("PermUsuario"),"|")(2)
 													<tr>
 														<th>#</th>
 														<th>Nome</th>
-														<th>Login</th>
-														<th>Data Cadastro</th>
+														<th>Descricao</th>
+														<th>Ordem</th>
 														<th>Situação</th>
 														<%if alterar = "S" then%>
 														<th></th>
@@ -262,18 +164,18 @@ alterar = split(session("PermUsuario"),"|")(2)
 															If contador>inicio Then
 															%>
 															<tr <%if contador mod 2 then %>class="info" <%end if%>>
-																<td><%=objRs("usuario_id")%></td>
+																<td><%=objRs("modulo_id")%></td>
 																<td><%=objRs("nome")%></td>
-																<td><%=objRs("login")%></td>
-																<td><%=objRs("data_cadastro")%></td>
+																<td><%=objRs("Descricao")%></td>
+																<td><%=objRs("ordem")%></td>
 																<td>
-																	<select name="situacaoUsuario" id="situacaoUsuario" class="form-control" onchange="javascript:atualizaSituacao(this.value);" >
-																		<option value="A|<%=objRs("usuario_id")%>" <%if objRs("situacao") = "A" then response.write "selected"%>>Ativo</option>
-																		<option value="I|<%=objRs("usuario_id")%>" <%if objRs("situacao") = "I" then response.write "selected"%>>Inativo</option>
+																	<select name="situacaoModulo" id="situacaoModulo" class="form-control" onchange="javascript:atualizaSituacao(this.value);" >
+																		<option value="A|<%=objRs("modulo_id")%>" <%if objRs("situacao") = "A" then response.write "selected"%>>Ativo</option>
+																		<option value="I|<%=objRs("modulo_id")%>" <%if objRs("situacao") = "I" then response.write "selected"%>>Inativo</option>
 																	</select>
 																</td>
 																<%if alterar = "S" then%>
-																<td align="center"><button type="button" class="btn btn-info" onclick="javascript:alterar('<%=objRs("usuario_id")%>')">Alterar</button></td>
+																<td align="center"><button type="button" class="btn btn-info" onclick="javascript:alterar('<%=objRs("modulo_id")%>')">Alterar</button></td>
 																<%end if%>
 															</tr>
 															<%
@@ -289,17 +191,17 @@ alterar = split(session("PermUsuario"),"|")(2)
 														<td colspan="6" align="center">
 															<nav>
 															  <ul class="pagination">
-																<li class="<%if pagina = 1 then%>disabled<%end if%>"><a href="javascript:paginar('consUsuario_02.asp?pagina=<%=(pagina-1)%>','<%=(pagina-1)%>')" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>
+																<li class="<%if pagina = 1 then%>disabled<%end if%>"><a href="javascript:paginar('consModulo_02.asp?pagina=<%=(pagina-1)%>','<%=(pagina-1)%>')" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>
 																<%
 																For i=1 to totalRegistroPagina
 																	If i=pagina Then
-																		response.Write "<li class='active'><a href=javascript:paginar('consUsuario_02.asp?pagina="&i&"','" & pagina &"')> "&i&"<span class='sr-only'>(current)</span></a></li>"
+																		response.Write "<li class='active'><a href=javascript:paginar('consModulo_02.asp?pagina="&i&"','" & pagina &"')> "&i&"<span class='sr-only'>(current)</span></a></li>"
 																	Else
-																		response.Write "<li><a href=javascript:paginar('consUsuario_02.asp?pagina="&i&"','" & pagina& "')> "&i&" </a></li>"
+																		response.Write "<li><a href=javascript:paginar('consModulo_02.asp?pagina="&i&"','" & pagina& "')> "&i&" </a></li>"
 																	End if
 																Next
 																%>
-																<%If totalRegistroPagina>pagina Then%><li><a href="javascript:paginar('consUsuario_02.asp?pagina=<%=(pagina+1)%>','<%=(pagina+1)%>')" aria-label="Next"><i class="fa fa-angle-right"></i></a></li><%end if%>
+																<%If totalRegistroPagina>pagina Then%><li><a href="javascript:paginar('consModulo_02.asp?pagina=<%=(pagina+1)%>','<%=(pagina+1)%>')" aria-label="Next"><i class="fa fa-angle-right"></i></a></li><%end if%>
 															 </ul>
 														   </nav>
 														</td>
@@ -318,11 +220,7 @@ alterar = split(session("PermUsuario"),"|")(2)
 										call BotaoForm(cstr(strBotoesExibir),cstr(session("PermUsuario")))
 										%>
 										</p>
-										<input type="hidden" name="nomeUsuario" value="<%=strNome%>">
-										<input type="hidden" name="login" value="<%=strLogin%>">
-										<input type="hidden" name="empresa" value="<%=intEmpresa%>">
-										<input type="hidden" name="loja" value="<%=intLoja%>">
-										<input type="hidden" name="perfil" value="<%=strPerfil%>">
+										<input type="hidden" name="nome" value="<%=strNome%>">
 										<input type="hidden" name="situacao" value="<%=strSituacao%>">
 									</form>
 								</div>
@@ -338,7 +236,7 @@ alterar = split(session("PermUsuario"),"|")(2)
    	    <div class="dev-page">
 			<!-- page footer -->   
 			<!-- dev-page-footer-closed dev-page-footer-fixed -->
-			<!--#include file="inc\rodape.asp"-->
+			<!--#include file="..\inc\rodape.asp"-->
             <!-- /page footer -->
 		</div>
         <!--//footer-->
@@ -364,33 +262,33 @@ alterar = split(session("PermUsuario"),"|")(2)
 				}
 			}
 			
-			function alterar(usuarioId){
-				document.form01.action = "cadUsuarioADM_01.asp?acao=A&usuarioId=" + usuarioId;
+			function alterar(moduloId){
+				document.form01.action = "cadModulo_01.asp?acao=A&moduloId=" + moduloId;
 				document.form01.submit();
 			}
 		</script>
 	<!-- Bootstrap Core JavaScript --> 
 		
-        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="../js/bootstrap.min.js"></script>
 
-        <script type="text/javascript" src="js/dev-loaders.js"></script>
-        <script type="text/javascript" src="js/dev-layout-default.js"></script>
-		<script type="text/javascript" src="js/jquery.marquee.js"></script>
-		<link href="css/bootstrap.min.css" rel="stylesheet">
+        <script type="text/javascript" src="../js/dev-loaders.js"></script>
+        <script type="text/javascript" src="../js/dev-layout-default.js"></script>
+		<script type="text/javascript" src="../js/jquery.marquee.js"></script>
+		<link href="../css/bootstrap.min.css" rel="stylesheet">
 
-		<script type="text/javascript" src="js/jquery.jqcandlestick.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/jqcandlestick.css" />
+		<script type="text/javascript" src="../js/jquery.jqcandlestick.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/jqcandlestick.css" />
 		
 		<!--max-plugin-->
-		<script type="text/javascript" src="js/plugins.js"></script>
+		<script type="text/javascript" src="../js/plugins.js"></script>
 		<!--//max-plugin-->
 		
 		<!--scrolling js-->
-		<script src="js/jquery.nicescroll.js"></script>
-		<script src="js/scripts.js"></script>
+		<script src="../js/jquery.nicescroll.js"></script>
+		<script src="../js/scripts.js"></script>
 		<!--//scrolling js-->
 		<!-- input-forms -->
-		<script type="text/javascript" src="js/valida.2.1.6.min.js"></script>
+		<script type="text/javascript" src="../js/valida.2.1.6.min.js"></script>
 		<script type="text/javascript" >
 			function verificaForcaSenha(){
 				senha = document.getElementById("senha").value;
@@ -437,7 +335,7 @@ alterar = split(session("PermUsuario"),"|")(2)
 			function atualizaSituacao(valor){
 				var dados = $(this).serialize();
 				$.ajax({
-					url: 'atualizaSituacaoUsuario.asp?situacaoNova=' + valor,
+					url: 'atualizaSituacaoModulo.asp?situacaoNova=' + valor,
 					type: 'POST',
 					dataType: 'html',
 					data: dados,
@@ -466,12 +364,12 @@ alterar = split(session("PermUsuario"),"|")(2)
 			$(document).ready( function(){
 				
 				$('#cadastrar').click( function(){
-					$('form').attr('action', 'cadUsuarioADM_01.asp');
+					$('form').attr('action', 'cadModulo_01.asp');
 					$('form').trigger( 'submit' );
 				});
 				
 				$('#voltar').click( function(){
-					$('form').attr('action', 'consUsuario_01.asp');
+					$('form').attr('action', 'consModulo_01.asp');
 					$('form').trigger( 'submit' );
 				});
 				
@@ -553,7 +451,7 @@ alterar = split(session("PermUsuario"),"|")(2)
 		</script>
 		<!-- //input-forms -->
 		<!--validator js-->
-		<script src="js/validator.min.js"></script>
+		<script src="../js/validator.min.js"></script>
 		<!--//validator js-->
 	
 		

@@ -1,5 +1,5 @@
-<!--#include file="inc\conexao.asp"-->
-<!--#include file="inc\funcoes.asp"-->
+<!--#include file="..\inc\conexao.asp"-->
+<!--#include file="..\inc\funcoes.asp"-->
 <%
 intClienteID = request("cliente_id")
 strLinhaVazia = request("linhaVazia")

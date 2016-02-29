@@ -156,4 +156,23 @@ function msgRetornoSucesso()
 	end if
 	session("msgRetornoSucesso")=""
 end function
+
+
+Function getSiteURL()
+	port = "http" 
+	pasta = "/eva"
+	https = lcase(request.ServerVariables("HTTPS")) 
+	if https <> "off" then prot = "https" 
+	domainname = Request.ServerVariables("SERVER_NAME") 
+	filename = Request.ServerVariables("SCRIPT_NAME") 
+	querystring = Request.ServerVariables("QUERY_STRING") 
+	fullpath = port & "://" & domainname & Request.ServerVariables("SCRIPT_NAME")
+	filename = right(fullpath, InStr(StrReverse(fullpath), StrReverse("/")))
+
+	fullpath = port & "://" & Request.ServerVariables("SERVER_NAME") & pasta
+	
+	url = Replace(fullpath, filename, "/")
+
+	response.write url 
+end Function 
 %>

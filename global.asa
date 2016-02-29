@@ -7,15 +7,16 @@ SUB Application_OnStart
 
 	' Define o tempo de inatividade de cada sessão
 	Session.Timeout=9999999999
+	
 
 	' O método "Lock" bloqueia a variável Application para que possa ser atualizada Se não a bloquearmos, ela não será atualizada
-	'Application.Lock
+	Application.Lock
 
-	'Application("Usuarios_Ativos") = 0
+	Application("site") = "http://"& Request.ServerVariables("SERVER_NAME") & "/eva"
 
 	' Desbloqueamos a variável Application
 
-	'Application.UnLock
+	Application.UnLock
 END SUB
 
 

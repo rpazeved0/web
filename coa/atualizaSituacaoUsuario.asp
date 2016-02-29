@@ -1,5 +1,5 @@
-<!--#include file="inc\conexao.asp"-->
-<!--#include file="inc\funcoes.asp"-->
+<!--#include file="..\inc\conexao.asp"-->
+<!--#include file="..\inc\funcoes.asp"-->
 <%
 on error resume next
 

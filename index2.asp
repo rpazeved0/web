@@ -73,7 +73,7 @@
 							</div>
 							<div class="grid-right">
 								<h3>Produtos</h3>
-								<p>65465</p>
+								<p>65465</br></p>
 							</div>
 							<div class="clearfix"> </div>
 						</div>

@@ -1,5 +1,68 @@
 <!DOCTYPE HTML>
-<!--#include file="inc\verificaSession.asp"-->
+<!--#include file="..\inc\verificaSession.asp"-->
+<!--#include file="..\inc\conexao.asp"-->
+<%
+intUsuarioId = request("usuarioId")
+strAcao = request("acao")
+
+'response.write intUsuarioId
+'response.write strAcao
+if strAcao = "A" then
+	
+	strSql = " select enu.nome nome_usuario " & _
+	"	, enu.email " & _
+	"	, lu.loja_id " & _
+	"	, enl.nome nome_loja " & _
+	"	, cl.cliente_id " & _
+	"	, enc.nome nome_loja " & _
+	"	, us.login " & _
+	"	, us.senha " & _
+	"	, us.situacao " & _
+	"	, us.entidade_id " & _
+	" from  " & _
+	"	entidade enu inner join usuario us on enu.entidade_id = us.entidade_id " & _
+	"	left join loja_usuario lu on us.usuario_id = lu.usuario_id " & _
+	"	left join loja lo on lu.loja_id = lo.loja_id " & _
+	"	left join entidade enl on lo.entidade_id = enl.entidade_id " & _
+	"	left join cliente cl on lo.cliente_id = cl.cliente_id " & _
+	"	left join entidade enc on cl.entidade_id = enc.entidade_id " & _
+	"where us.usuario_id = " & intUsuarioId
+	
+	set objRs = server.createobject("adodb.recordset")
+	objRs.open strSql,conexao,3,3
+	if not objRs.eof then
+		strNomeUsuario = objRs("nome_usuario")
+		strEmail = objRs("email")
+		intLojaId = objRs("loja_id")
+		intClienteId = objRs("cliente_id")
+		strLogin = objRs("login")
+		strSenha = decripta(objRs("senha"))
+		strSituacao = objRs("situacao")
+		intEntidadeId = objRs("entidade_id")
+	end if
+	objRs.close
+	set objRs = nothing
+	
+	if intUsuarioId <> "" then
+		strSql = "select * from perfil pe, perfil_usuario pu where pe.perfil_id = pu.perfil_id and pu.usuario_id = " & intUsuarioId
+		set objRs = server.createobject("adodb.recordset")
+		objRs.open strSql,conexao,3,3
+		if not objRs.eof then
+			do while not objRs.eof
+				strPerfil = strPerfil & objRs("perfil_id") & ","
+				objRs.movenext	
+			loop
+			strPerfil = left(strPerfil,len(strPerfil)-1)
+		end if
+		objRs.close
+		set objRs = nothing
+		
+		
+	end if
+ 
+
+end if
+%>
 <html>
 <head>
 <title>EVA ::Home </title>
@@ -8,26 +71,26 @@
 <meta name="keywords" content="" />
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
 <!-- Bootstrap Core CSS -->
-<link href="css/bootstrap.css" rel='stylesheet' type='text/css' />
+<link href="../css/bootstrap.css" rel='stylesheet' type='text/css' />
 <!-- Custom CSS -->
-<link href="css/style.css" rel='stylesheet' type='text/css' />
+<link href="../css/style.css" rel='stylesheet' type='text/css' />
 <!-- font CSS -->
 <link rel="icon" href="favicon.ico" type="image/x-icon" >
 <!-- font-awesome icons -->
-<link href="css/font-awesome.css" rel="stylesheet"> 
+<link href="../css/font-awesome.css" rel="stylesheet"> 
 <!-- //font-awesome icons -->
 <!-- chart -->
-<script src="js/Chart.js"></script>
+<script src="../js/Chart.js"></script>
 <!-- //chart -->
  <!-- js-->
-<script src="js/jquery-1.11.1.min.js"></script>
-<script src="js/modernizr.custom.js"></script>
+<script src="../js/jquery-1.11.1.min.js"></script>
+<script src="../js/modernizr.custom.js"></script>
 <!--webfonts-->
 <link href='//fonts.googleapis.com/css?family=Roboto+Condensed:400,300,300italic,400italic,700,700italic' rel='stylesheet' type='text/css'>
 <!--//webfonts--> 
 <!--animate-->
-<link href="css/animate.css" rel="stylesheet" type="text/css" media="all">
-<script src="js/wow.min.js"></script>
+<link href="../css/animate.css" rel="stylesheet" type="text/css" media="all">
+<script src="../js/wow.min.js"></script>
 	<script>
 		 new WOW().init();
 	</script>
@@ -38,9 +101,9 @@
 
 <!--//Metis Menu -->
 <!-- Metis Menu -->
-<script src="js/metisMenu.min.js"></script>
-<script src="js/custom.js"></script>
-<link href="css/custom.css" rel="stylesheet">
+<script src="../js/metisMenu.min.js"></script>
+<script src="../js/custom.js"></script>
+<link href="../css/custom.css" rel="stylesheet">
 <!--//Metis Menu -->
 </head> 
 <body class="cbp-spmenu-push">
@@ -50,7 +113,7 @@
             <div class="navbar-collapse">
 				<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right dev-page-sidebar mCustomScrollbar _mCS_1 mCS-autoHide mCS_no_scrollbar" id="cbp-spmenu-s1">
 					<div class="scrollbar scrollbar1">
-						<!--#include file="inc\menuDireito.asp"-->
+						<!--#include file="..\inc\menuDireito.asp"-->
 					</div>
 					<!-- //sidebar-collapse -->
 				</nav>
@@ -59,7 +122,7 @@
 		<!--left-fixed -navigation-->
 		<!-- header-starts -->
 		<div class="sticky-header header-section ">
-			<!--#include file="inc\topo.asp"-->
+			<!--#include file="..\inc\topo.asp"-->
 		</div>
 		<!-- //header-ends -->
 		<!-- main content start-->
@@ -68,28 +131,80 @@
 					<!--grids-->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>Usuário</h2>
+						<h2><%if strAcao = "A" then%>Alterar Usuário<%else%>Cadastro de Usuário<%end if%></h2>
 					</div>
 					<div class="forms-grids">
-						<div class="col-md-12">
+						<div class="col-md-8">
 							<div class="panel panel-widget">
 								<div class="my-div">
-									<form method="post" class="valida"  id="form01" name="form01" action="">
+									<form method="post" class="valida"  id="form01" name="form01" action="cadUsuarioADM_02.asp">
   									    <div class="" id="msg">
 											<%call msgRetornoSucesso()%>
 											<%call msgRetornoErro()%>
 										</div>
 										<label for="nomeUsuario" >Nome:</label>
 										<div class="form-group" >
-											<input type="text" name="nomeUsuario" id="nomeUsuario" class="form-control"	/>
+											<input type="text" name="nomeUsuario" value="<%=strNomeUsuario%>" id="nomeUsuario" required="true" class="form-control"	/>
+										</div>
+										<div class="row" >
+
+											<div class="col-xs-12 col-sm-5" >
+
+												<label for="field-1-2" >E-mail:</label>
+												<div class="form-group" >
+													<input type="text" name="email1" id="email1" value="<%=strEmail%>" filter="email" class="form-control" required="true"
+														data-invalid="Campo com e-mail inválido"  />
+												</div>
+
+											</div>
+
+											<div class="col-xs-12 col-sm-7" >
+
+												<label for="field-1-2" >Redigite o e-mail:</label>
+												<div class="form-group" >
+													<input type="text" name="email2" id="email2" value="<%=strEmail%>" filter="email|matches:email1" class="form-control" required="true"
+														data-invalid="E-mail inválido ou diferente do digitado"  />
+												</div>
+
+											</div>
+
 										</div>
 
 										<label for="field-1-3" >Login:</label>
 										<div class="form-group">
-										  <input type="text"  maxlength="30" name="login" minlength="6" class="form-control" id="login" class="form-control" />
+										  <input type="text"  maxlength="30" name="login" minlength="6" value="<%=strLogin%>" class="form-control" id="login"   required="true"
+										   class="form-control" />
 										   <div id="MsgErroLogin"></div>
 										   <div id="MsgVerificaLogin"></div>
+										  <span class="help-block">Mínimo de 6 caracteres</span>
 										</div>
+										
+										<label for="senha" >Senha:</label>
+										<div class="form-group">
+										  <input type="password"  maxlength="20" class="form-control" value="<%=strSenha%>" name="senha" id="senha" placeholder="Senha" required="true">
+										  <div id="MsgErroSenha"></div>
+										  <span class="help-block">Mínimo de 8 caracteres</span>
+										  <table id="mostra"></table>
+										</div>
+										<div class="form-group">
+										  <input type="password" class="form-control" maxlength="20" id="senha2" value="<%=strSenha%>" filter="password|matches:senha" data-invalid="Senha diferente do campo anterior" placeholder="Confirme a senha" required="true">
+										  <div id="MsgErroSenha2"></div>
+										  <div class="help-block with-errors"></div>
+										</div>
+										<!--div class="form-group">
+											<div class="radio">
+												<label>
+													<input type="radio" name="sexo" required="true" value="M">
+													Masculino
+												</label>
+											</div>
+											<div class="radio">
+												<label>
+													<input type="radio" name="sexo" required="true" value="F">
+													Feminino
+												</label>
+											</div>
+										</div-->
 										<label for="empresa" >Empresa:</label>
 										<div class="form-group" >
 											<select name="empresa" id="empresa" class="form-control" >
@@ -108,7 +223,7 @@
 												if not objRS.eof then
 													do while not objRS.eof
 													%>
-														<option value="<%=objRS("cliente_id")%>"><%=objRS("nome_cliente")%></option>
+														<option <%if intClienteId = objRS("cliente_id") then %>selected<%end if%> value="<%=objRS("cliente_id")%>"><%=objRS("nome_cliente")%></option>
 													<%
 													objRS.movenext
 													loop
@@ -125,16 +240,15 @@
 											</select>
 										</div>
 										<label for="loja" >Situação:</label>
-										<div class="form-group" id="loja" >
+										<div class="form-group" id="situacao" >
 											<select name="situacao" id="situacao" class="form-control" >
-												<option value=""></option>
-												<option value="A">Ativo</option>
-												<option value="I">Inativo</option>
+												<option value="A" <%if strSituacao = "A" then%>selected<%end if%> >Ativo</option>
+												<option value="I" <%if strSituacao = "I" then%>selected<%end if%> >Inativo</option>
 											</select>
 										</div>
 										<label for="perfil" >Perfil de acesso:</label>
 										<div class="form-group" id="perfilacesso" >
-											<select name="perfil" id="perfil" class="form-control" multiple>
+											<select name="perfil" id="perfil" class="form-control" required="true" multiple>
 												<option value=""></option>
 												<%
 												strSql = "select * from perfil p"
@@ -143,7 +257,7 @@
 												if not objRS.eof then
 													do while not objRS.eof
 													%>
-														<option value="<%=objRS("perfil_id")%>"><%=objRS("nome")%></option>
+														<option <%if instr(strPerfil,objRS("perfil_id")) > 0 then%>selected<%end if%> value="<%=objRS("perfil_id")%>"><%=objRS("nome")%></option>
 													<%
 													objRS.movenext
 													loop
@@ -152,26 +266,30 @@
 												set objRS = nothing
 												%>
 											</select>
-											
 										</div>
-										
 										<hr >
 										<p>
-
 										
 										<%
-										'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar	
+										'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar,Voltar
 										'Consultar,Incluir,Alterar,Deletar,Executar
 										'S        ,S      ,S      ,S      ,S       
-										strBotoesExibir = "C|I|N|N|N|L"		
-										call BotaoForm(cstr(strBotoesExibir),cstr(session("PermUsuario")))
+										if strAcao = "A" then
+											strBotoesExibir = "N|N|A|N|N|N|V"		
+										else
+											strBotoesExibir = "N|I|N|N|N|L|V"		
+										end if										
+										call BotaoForm(strBotoesExibir,session("PermUsuario"))
 										%>
 										</p>
+										<input type="hidden" name="acao" value="<%=strAcao%>">
+										<input type="hidden" name="entidade_id" value="<%=intEntidadeId%>">
+										
+										<input type="hidden" name="usuario_id" value="<%=intUsuarioId%>">
 									</form>
 								</div>
 							</div>
 						</div>
-						
 						<div class="clearfix"> </div>
 					</div>
 				</div>
@@ -182,7 +300,7 @@
    	    <div class="dev-page">
 			<!-- page footer -->   
 			<!-- dev-page-footer-closed dev-page-footer-fixed -->
-			<!--#include file="inc\rodape.asp"-->
+			<!--#include file="..\inc\rodape.asp"-->
             <!-- /page footer -->
 		</div>
         <!--//footer-->
@@ -210,26 +328,26 @@
 		</script>
 	<!-- Bootstrap Core JavaScript --> 
 		
-        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="../js/bootstrap.min.js"></script>
 
-        <script type="text/javascript" src="js/dev-loaders.js"></script>
-        <script type="text/javascript" src="js/dev-layout-default.js"></script>
-		<script type="text/javascript" src="js/jquery.marquee.js"></script>
-		<link href="css/bootstrap.min.css" rel="stylesheet">
+        <script type="text/javascript" src="../js/dev-loaders.js"></script>
+        <script type="text/javascript" src="../js/dev-layout-default.js"></script>
+		<script type="text/javascript" src="../js/jquery.marquee.js"></script>
+		<link href="../css/bootstrap.min.css" rel="stylesheet">
 
-		<script type="text/javascript" src="js/jquery.jqcandlestick.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/jqcandlestick.css" />
+		<script type="text/javascript" src="../js/jquery.jqcandlestick.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/jqcandlestick.css" />
 		
 		<!--max-plugin-->
-		<script type="text/javascript" src="js/plugins.js"></script>
+		<script type="text/javascript" src="../js/plugins.js"></script>
 		<!--//max-plugin-->
 		
 		<!--scrolling js-->
-		<script src="js/jquery.nicescroll.js"></script>
-		<script src="js/scripts.js"></script>
+		<script src="../js/jquery.nicescroll.js"></script>
+		<script src="../js/scripts.js"></script>
 		<!--//scrolling js-->
 		<!-- input-forms -->
-		<script type="text/javascript" src="js/valida.2.1.6.min.js"></script>
+		<script type="text/javascript" src="../js/valida.2.1.6.min.js"></script>
 		<script type="text/javascript" >
 			function verificaForcaSenha(){
 				senha = document.getElementById("senha").value;
@@ -272,7 +390,7 @@
 					//$('form').submit( function(){
 						var dados = $(this).serialize();
 						$.ajax({
-							url: 'carregaLoja.asp?linhaVazia=S&cliente_id=' + $('#empresa').val(),
+							url: 'carregaLoja.asp?loja_id=<%=intLojaId%>&cliente_id=' + $('#empresa').val(),
 							type: 'POST',
 							dataType: 'html',
 							data: dados,
@@ -286,15 +404,46 @@
 					//$('form').trigger( 'submit' );
 				});
 				
-				$('#consultar').click( function(){
-					$('form').attr('action', 'consUsuario_02.asp');
+				<%if intClienteId <> "" then%>
+				var dados = $(this).serialize();
+				$.ajax({
+					url: 'carregaLoja.asp?loja_id=<%=intLojaId%>&cliente_id=<%=intClienteId%>',
+					type: 'POST',
+					dataType: 'html',
+					data: dados,
+					success: function(data){
+						
+						$('#loja'). empty(). html(data);
+					}
+				});
+				<%end if%>
+				
+				
+				$('#login').change( function(){
+						var dados = $(this).serialize();
+						$.ajax({
+							url: 'verificaLoginExiste.asp?login=' + $('#login').val(),
+							type: 'POST',
+							dataType: 'html',
+							data: dados,
+							success: function(data){
+								//$('#loja'). empty(). html(data);
+								if (data != ''){
+									$("#MsgVerificaLogin").text(data);
+									$('#login').val("");
+								}else{
+									$("#MsgVerificaLogin").text("");
+								}
+							}
+						});
+				});
+				
+				
+				$('#voltar').click( function(){
+					$('form').attr('action', 'consUsuario_01.asp');
 					$('form').trigger( 'submit' );
 				});
 				
-				$('#cadastrar').click( function(){
-					$('form').attr('action', 'cadUsuarioADM_01.asp');
-					$('form').trigger( 'submit' );
-				});
 			});
 			
 			/*$(function()
@@ -313,6 +462,24 @@
 					}
 				});
 			});*/
+			
+			$('#login').blur(function(e){
+				if($('#login').val().length < 6){
+				   $('#login').focus()
+				   $("#MsgErroLogin").text("Campo de conter entre 6 a 30 caracteres.");
+				}else{
+					$("#MsgErroLogin").text("");
+				}
+			});
+			
+			$('#senha').blur(function(e){
+				if($('#senha').val().length < 8){
+				   $('#senha').focus()
+				   $("#MsgErroSenha").text("Campo de conter entre 8 a 20 caracteres.");
+				}else{
+					$("#MsgErroSenha").text("");
+				}
+			});
 			
 			
 			$(document).ready(function() {
@@ -372,7 +539,7 @@
 		</script>
 		<!-- //input-forms -->
 		<!--validator js-->
-		<script src="js/validator.min.js"></script>
+		<script src="../js/validator.min.js"></script>
 		<!--//validator js-->
 	
 		

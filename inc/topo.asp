@@ -9,10 +9,10 @@ end if
 <div class="header-left">
 	<!--logo -->
 	<div class="logo">
-		<a href="index2.asp">
+		<a href="<%=getSiteURL()%>/index2.asp">
 			<ul>	
 				<li><!--img src="images/logo1.png" alt="" /--></li>
-				<li><h1>EVA</h1></li>
+				<li><h1>EVA<%=getSiteURL()%></h1></li>
 				<div class="clearfix"> </div>
 			</ul>
 		</a>

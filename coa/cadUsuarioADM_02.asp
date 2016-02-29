@@ -1,18 +1,18 @@
-<!--#include file="inc\conexao.asp"-->
-<!--#include file="inc\funcoes.asp"-->
-<!--#include file="inc\verificaSession.asp"-->
+<!--#include file="..\inc\conexao.asp"-->
+<!--#include file="..\inc\funcoes.asp"-->
+<!--#include file="..\inc\verificaSession.asp"-->
 <%
 on error resume next
 
-strNomeUsuario = request("nomeUsuario")
-strEmail = request("email1")
-strLogin = request("login")
+strNomeUsuario = trim(request("nomeUsuario"))
+strEmail = trim(request("email1"))
+strLogin = trim(request("login"))
 strSenha = Encripta(request("senha"))
-strSexo = request("sexo")
-intEmpresa = request("empresa")
-intLoja = request("loja")
-strPerfil = request("perfil")
-strSituacao = request("situacao")
+strSexo = trim(request("sexo"))
+intEmpresa = trim(request("empresa"))
+intLoja = trim(request("loja"))
+strPerfil = trim(request("perfil"))
+strSituacao = trim(request("situacao"))
 strAcao = request("acao")
 intEntidadeId = request("entidade_id")
 intTipoEntidade = 1 'Usuario
