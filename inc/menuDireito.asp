@@ -1,6 +1,6 @@
 <!--#include file="conexao.asp"-->
 <%
-strSqlModulo = "select distinct * from (select  ap.modulo_id, mo.nome nome_modulo, mo.url url_modulo, mo.ordem ordem_modulo " & _
+strSqlModulo = "select distinct * from (select  mo.modulo_id, mo.nome nome_modulo, mo.url url_modulo, mo.ordem ordem_modulo " & _
 			   "			from  [EVA].[dbo].[usuario] usu,  " & _
 				"							[EVA].[dbo].[perfil_usuario] pu, " & _
 				"							[EVA].[dbo].[autorizacao_perfil] ap, " & _
@@ -45,13 +45,15 @@ strSqlFuncao = " select distinct * from (select    ap.funcao_id, " & _
  " ) a " & _
  " order by ordem_funcao "
 
-
+intModulo = request("intModulo")
+ 
 set objRS = server.CreateObject("adodb.recordset")
 objRS.open strSqlModulo,conexao,3,3
 %>
 <script>
-	function enviaFormaPerm(url,perm){
+	function enviaFormaPerm(url,perm,modulo){
 		document.formPerm.strPermUsuario.value = perm;
+		document.formPerm.intModulo.value = modulo;
 		document.formPerm.action = url;
 		document.formPerm.submit();	
 	}
@@ -59,7 +61,7 @@ objRS.open strSqlModulo,conexao,3,3
 <form name="formPerm" method="post">
 <ul class="nav" id="side-menu">
 	<li>
-		<a href="index2.asp" class="active"><i class="fa fa-home nav_icon"></i>Dashboard</a>
+		<a href="<%=getSiteURL()%>/index2.asp" class="active"><i class="fa fa-home nav_icon"></i>Dashboard</a>
 	</li>
 	<%
 	strUrlModulo = ""
@@ -70,10 +72,19 @@ objRS.open strSqlModulo,conexao,3,3
 			else
 				strUrlModulo = objRS("url_modulo")
 			end if
+			
+			if intModulo <> "" then
+				if cstr(intModulo) = cstr(objRs("modulo_id")) then
+					strDisplay = "style=display:block"
+				else 
+					strDisplay = "style=display:none"
+				end if		
+			end if
+			
 			%>
 			<li>
 				<a href="<%=strUrlModulo%>"><i class="fa fa-check-square-o nav_icon"></i><%=objRS("nome_modulo")%><span class="fa arrow"></span></a>
-				<ul class="nav nav-second-level collapse">
+				<ul class="nav nav-second-level collapse" <%=strDisplay%> >
 					<%
 					set objRSFunc = server.CreateObject("adodb.recordset")
 					objRSFunc.open replace(strSqlFuncao,"@modulo_id",objRs("modulo_id")), conexao, 3, 3
@@ -85,7 +96,7 @@ objRS.open strSqlModulo,conexao,3,3
 							strPermUsuario = objRSFunc("consultar") &"|"& objRSFunc("inserir") &"|"& objRSFunc("atualizar") &"|"& objRSFunc("deletar") &"|"& objRSFunc("executar")
 							%>
 							<li>
-								<a href="javascript:enviaFormaPerm('<%=getSiteURL()&strUrlFuncao%>','<%=strPermUsuario%>');"><%=objRSFunc("nome_funcao")& Application("site")%></a>
+								<a href="javascript:enviaFormaPerm('<%=getSiteURL()&strUrlFuncao%>','<%=strPermUsuario%>','<%=objRs("modulo_id")%>');"><%=objRSFunc("nome_funcao")& Application("site")%></a>
 							</li>
 							<%
 							objRSFunc.movenext
@@ -102,8 +113,10 @@ objRS.open strSqlModulo,conexao,3,3
 		loop
 	end if
 	%>
-	<input type="hidden" name="strPermUsuario" value="">
+
 </ul>
+<input type="hidden" name="strPermUsuario" value="">
+<input type="hidden" name="intModulo" value="">
 </form>
 <%
 objRS.close
