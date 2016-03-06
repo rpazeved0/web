@@ -11,7 +11,7 @@ Const EncKey = 115
 
 '==============================================================
 '########################
-'Criptografa informa��es
+'Criptografa informações
 '########################
 Function Encripta(Texto)
 	TempStr = Texto
@@ -30,7 +30,7 @@ End Function
 
 '==============================================================
 '########################
-'Descriptografa informa��es
+'Descriptografa informações
 '########################
 
 Function Decripta(Texto)
@@ -59,7 +59,7 @@ function LimpaSQLInjection(texto)
 end function
 
 'strExibir = Botoes que seram exibidos na pagina: 'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar
-'strPermissao = permissao que o usu�rio tem 
+'strPermissao = permissao que o usuário tem 
 'Consultar,Incluir,Alterar,Deletar,Executar
 'S        ,S      ,S      ,S      ,S       
 'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar	
@@ -175,4 +175,52 @@ Function getSiteURL()
 
 	response.write url 
 end Function 
+
+
+function retornaNomeModulo(moduloId)
+	if moduloId <> "" then
+		strSqlMod = "select nome from modulo where modulo_id = " & moduloId
+		set objRsMod = server.createobject("adodb.recordset")
+		objRsMod.open strSqlMod, conexao,3,3
+		if not objRsMod.eof then
+			retornaNomeModulo = objRsMod("nome")
+		end if
+		objRsMod.close
+		set objRsMod = nothing
+	else
+		retornaNomeModulo = ""
+	end if
+end function
+
+Function TirarAcento(Palavra)
+	CAcento = "àáâãäèéêëìíîïòóôõöùúûüÀÁÂÃÄÈÉÊËÌÍÎÒÓÔÕÖÙÚÛÜçÇñÑ"
+	SAcento = "aaaaaeeeeiiiiooooouuuuAAAAAEEEEIIIOOOOOUUUUcCnN"
+	Texto = ""
+	If Palavra <> "" then
+			For X = 1 To Len(Palavra)
+				   Letra = Mid(Palavra,X,1)
+				   Pos_Acento = InStr(CAcento,Letra)
+				   If Pos_Acento > 0 Then Letra = mid(SAcento,Pos_Acento,1)
+				   Texto = Texto & Letra
+			Next
+			TirarAcento = Texto
+	End If
+End Function  
+
+Function TrocarAcento(Palavra)
+CAcento = "àáâãäèéêëìíîïòóôõöùúûüÀÁÂÃÄÈÉÊËÌÍÎÒÓÔÕÖÙÚÛÜçÇñÑ"
+Texto = ""
+If Palavra <> "" Then
+        For X = 1 to Len(Palavra)
+               Letra = Mid(Palavra,X,1)
+               Pos_Acento = InStr(CAcento,Letra)
+              If Pos_Acento > 0 Then Letra = "_"
+             Texto = Texto & Letra
+        Next
+      TrocarAcento = Texto
+End If
+End Function
+
+
+
 %>
