@@ -267,8 +267,8 @@ alterar = split(session("PermUsuario"),"|")(2)
 				}
 			}
 			
-			function alterar(moduloId){
-				document.form01.action = "cadModulo_01.asp?acao=A&moduloId=" + moduloId;
+			function alterar(funcaoId){
+				document.form01.action = "cadFuncao_01.asp?acao=A&funcaoId=" + funcaoId;
 				document.form01.submit();
 			}
 		</script>

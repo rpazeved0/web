@@ -4,10 +4,10 @@
 <%
 on error resume next
 
-intModuloId = request("modulo_id")
+intModuloId = request("modulo")
+intFuncaoId = request("funcao_id")
 strNome = trim(request("nome"))
 strSituacao = trim(request("situacao"))
-strDescricao = trim(request("descricao"))
 strUrl = trim(request("url"))
 intOrdem = trim(request("ordem"))
 strAcao = trim(request("acao"))
@@ -24,14 +24,14 @@ conexao.begintrans
 
 if strAcao = "A" then
 
-	strSql = "update [EVA].[dbo].[modulo] set nome='"& strNome &"',descricao='"& strDescricao &"',ordem="& intOrdem &",url='" & strUrl & "' where modulo_id = " & intModuloId
+	strSql = "update [EVA].[dbo].[funcao] set nome='"& strNome &"',ordem="& intOrdem &",url='" & strUrl & "',modulo_id= "& intModuloId &" where funcao_id = " & intFuncaoId
 	conexao.execute(strSql)
 	if err.number <> 0 then	bolErro = true
 	response.write strSql & "<br>"
 
 else
 
-	strSql = "insert into [EVA].[dbo].[modulo] (nome,descricao,ordem,situacao,url) values ('"& strNome &"','"& strDescricao &"',"& intOrdem &",'"& strSituacao &"','"& strUrl &"')"
+	strSql = "insert into [EVA].[dbo].[funcao] (nome,modulo_id,ordem,situacao,url) values ('"& strNome &"',"& intModuloId &","& intOrdem &",'"& strSituacao &"','"& strUrl &"')"
 	conexao.execute(strSql)
 	if err.number <> 0 then	bolErro = true
 	response.write strSql & "<br>"
@@ -48,31 +48,31 @@ if bolErro = false then
 		conexao.committrans
 		response.write "Commit"  &"<br>"
 		if strAcao = "A" then
-			session("msgRetornoSucesso") = "M&oacute;dulo alterado com sucesso"
+			session("msgRetornoSucesso") = "Função alterada com sucesso"
 		else
-			session("msgRetornoSucesso") = "M&oacute;dulo cadastrado com sucesso"
+			session("msgRetornoSucesso") = "Função cadastrado com sucesso"
 		end if	
 	else
 		conexao.rollbacktrans
 		if strAcao = "A" then
-			session("msgRetornoErro") = "Erro na alteração do M&oacute;dulo:" & err.number & "-" & err.description
+			session("msgRetornoErro") = "Erro na alteração da Função:" & err.number & "-" & err.description
 		else
-			session("msgRetornoErro") = "Erro na inclusão do M&oacute;dulo:" & err.number & "-" & err.description
+			session("msgRetornoErro") = "Erro na inclusão da Função:" & err.number & "-" & err.description
 		end if	
 	end if
 else
 	conexao.rollbacktrans
 	if strAcao = "A" then
-		session("msgRetornoErro") = "Erro na alteração do M&oacute;dulo:" & err.number & "-" & err.description
+		session("msgRetornoErro") = "Erro na alteração da Função:" & err.number & "-" & err.description
 	else
-		ession("msgRetornoErro") = "Erro na inclusão do M&oacute;dulo:" & err.number & "-" & err.description
+		ession("msgRetornoErro") = "Erro na inclusão da Função:" & err.number & "-" & err.description
 	end if	
 end if
 
 response.write session("msgRetornoErro")
 if strAcao = "A" then
-	response.redirect("consModulo_01.asp")
+	response.redirect("consFuncao_01.asp")
 else
-	response.redirect("cadModulo_01.asp")
+	response.redirect("cadFuncao_01.asp")
 end if	
 %>
