@@ -1,5 +1,22 @@
 <!DOCTYPE HTML>
 <!--#include file="..\inc\verificaSession.asp"-->
+<!--#include file="..\inc\conexao.asp"-->
+<%
+strNome = request("nome")
+
+strSql = ""
+strSql = strSql & " select perfil_id, p.nome from "
+strSql = strSql & "       	perfil p "
+strSql = strSql & " where 1=1 "
+
+if strNome <> "" then
+	strSql = strSql & "	 and upper(p.nome) like upper('%" &  strNome & "%') "
+end if
+
+strSql = strSql & " order by p.perfil_id "
+
+alterar = split(session("PermUsuario"),"|")(2)
+%>
 <html>
 <head>
 <title>EVA ::Home </title>
@@ -68,110 +85,119 @@
 					<!--grids-->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>Usuário</h2>
+						<h2>Consulta Perfil</h2>
 					</div>
 					<div class="forms-grids">
 						<div class="col-md-12">
 							<div class="panel panel-widget">
 								<div class="my-div">
 									<form method="post" class="valida"  id="form01" name="form01" action="">
-  									    <div class="" id="msg">
-											<%call msgRetornoSucesso()%>
-											<%call msgRetornoErro()%>
+										<div class="row" >
+											<div class="col-xs-12 col-sm-5" >
+												<label><b>Perfil:</b>&nbsp; <%=strNome%></label>
+											</div>
 										</div>
-										<label for="nomeUsuario" >Nome:</label>
-										<div class="form-group" >
-											<input type="text" name="nomeUsuario" id="nomeUsuario" class="form-control"	/>
-										</div>
-
-										<label for="field-1-3" >Login:</label>
-										<div class="form-group">
-										  <input type="text"  maxlength="30" name="login" minlength="6" class="form-control" id="login"  />
-										   <div id="MsgErroLogin"></div>
-										   <div id="MsgVerificaLogin"></div>
-										</div>
-										<label for="empresa" >Empresa:</label>
-										<div class="form-group" >
-											<select name="empresa" id="empresa" class="form-control" >
-												<option value=""></option>
-												<%
-												'coclocar por perfil, se o usuario for adm traz todos, se nao traz somente o cliente logado
-												strSql = "SELECT distinct en.nome nome_cliente, cl.cliente_id FROM [EVA].[dbo].[cliente] cl, [EVA].[dbo].[entidade] en, [EVA].[dbo].[loja_usuario] lu, [EVA].[dbo].[loja] lo where cl.entidade_id = en.entidade_id and cl.situacao = 'A' " & _
-														  "	and cl.cliente_id = lo.cliente_id  "
-												
-												if instr(session("perfil"),"1") = 0	then		
-													strSql = strSql & " and lu.usuario_id = " & session("usuario_id")
-												end if		  
-  
-												set objRS = server.createobject("adodb.recordset")
-												objRS.open strSql,conexao,3,3
-												if not objRS.eof then
-													do while not objRS.eof
-													%>
-														<option value="<%=objRS("cliente_id")%>"><%=objRS("nome_cliente")%></option>
-													<%
-													objRS.movenext
-													loop
-												end if
-												objRS.close
-												set objRS = nothing
-												%>
-											</select>
-										</div>
-										<label for="loja" >Loja:</label>
-										<div class="form-group" id="loja" >
-											<select name="loja" id="loja" class="form-control" >
-												<option value=""></option>
-											</select>
-										</div>
-										<label for="loja" >Situação:</label>
-										<div class="form-group" id="loja" >
-											<select name="situacao" id="situacao" class="form-control" >
-												<option value=""></option>
-												<option value="A">Ativo</option>
-												<option value="I">Inativo</option>
-											</select>
-										</div>
-										<label for="perfil" >Perfil de acesso:</label>
-										<div class="form-group" id="perfilacesso" >
-											<select name="perfil" id="perfil" class="form-control" multiple>
-												<option value=""></option>
-												<%
-												strSql = "select * from perfil p"
-												set objRS = server.createobject("adodb.recordset")
-												objRS.open strSql,conexao,3,3
-												if not objRS.eof then
-													do while not objRS.eof
-													%>
-														<option value="<%=objRS("perfil_id")%>"><%=objRS("nome")%></option>
-													<%
-													objRS.movenext
-													loop
-												end if
-												objRS.close
-												set objRS = nothing
-												%>
-											</select>
-											
-										</div>
-										
 										<hr >
 										<p>
-
+										<div class='alert alert-danger' role='alert' id='msgErro' style="display:none">
+										</div>
+										<div class='alert alert-success' role='alert' id='msgSucesso' style="display:none">
+										</div>
+										<div class="tables">
+											<table class="table"> 
+												<thead> 
+													<tr>
+														<th>#</th>
+														<th>Perfil</th>
+														<%if alterar = "S" then%>
+														<th></th>
+														<%end if%>
+													</tr>
+												</thead>
+												<tbody>
+													<%
+													'Define a quantidade de registros por pagina
+													registrosPagina = 10
+													
+													'response.write strSql												
+													set objRs = server.createobject("adodb.recordset")
+													objRs.open strSql,conexao,1
+													
+													totalRegistros = objRs.recordCount ' Pega o total de registros
+													response.write "Total:" & objRs.recordCount 
+    											    totalRegistroPagina = totalRegistros/registrosPagina ' Calcula o total de registro por página
+												    If (Int(totalRegistroPagina)-totalRegistroPagina < 0) then ' Verifica se o valor é menor que 0
+														totalRegistroPagina = int(totalRegistroPagina) + 1
+												    End If
+												    pagina = 1
+												    If Request.QueryString("pagina")<>"" Then  'Pega a pagina para listar
+														pagina = CInt(Request.QueryString("pagina"))
+												    End If
+												    inicio = ( pagina - 1 ) * registrosPagina 'Defini o inicio da lista
+												    final = registrosPagina + inicio 'Define o final da lista
+												    contador = 0 'Seta variavel de Contador
+													
+													
+													if not objRs.eof then
+														do while not objRs.eof and contador<final
+															contador = contador + 1 'Contador
+															If contador>inicio Then
+															%>
+															<tr <%if contador mod 2 then %>class="info" <%end if%>>
+																<td><%=objRs("perfil_id")%></td>
+																<td><%=objRs("nome")%></td>
+																<%if alterar = "S" then%>
+																<td align="center"><button type="button" class="btn btn-info" onclick="javascript:alterar('<%=objRs("perfil_id")%>')">Alterar</button></td>
+																<%end if%>
+															</tr>
+															<%
+															end if
+															objRs.movenext
+														loop
+													end if
+													objRs.close
+													set objRs = nothing
+													%>
+													<!--Paginação-->
+													<tr>
+														<td colspan="6" align="center">
+															<nav>
+															  <ul class="pagination">
+																<li class="<%if pagina = 1 then%>disabled<%end if%>"><a href="javascript:paginar('consPerfil_02.asp?pagina=<%=(pagina-1)%>','<%=(pagina-1)%>')" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>
+																<%
+																For i=1 to totalRegistroPagina
+																	If i=pagina Then
+																		response.Write "<li class='active'><a href=javascript:paginar('consPerfil_02.asp?pagina="&i&"','" & pagina &"')> "&i&"<span class='sr-only'>(current)</span></a></li>"
+																	Else
+																		response.Write "<li><a href=javascript:paginar('consPerfil_02.asp?pagina="&i&"','" & pagina& "')> "&i&" </a></li>"
+																	End if
+																Next
+																%>
+																<%If totalRegistroPagina>pagina Then%><li><a href="javascript:paginar('consPerfil_02.asp?pagina=<%=(pagina+1)%>','<%=(pagina+1)%>')" aria-label="Next"><i class="fa fa-angle-right"></i></a></li><%end if%>
+															 </ul>
+														   </nav>
+														</td>
+													</tr>
+													<!--Paginação-->
+												</tbody>
+											</table> 
+											
+										</div>
 										
 										<%
 										'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar	
 										'Consultar,Incluir,Alterar,Deletar,Executar
 										'S        ,S      ,S      ,S      ,S       
-										strBotoesExibir = "C|I|N|N|N|L"		
+										strBotoesExibir = "N|I|N|N|N|N|V"		
 										call BotaoForm(cstr(strBotoesExibir),cstr(session("PermUsuario")))
 										%>
 										</p>
+										<input type="hidden" name="nome" value="<%=strNome%>">
+										<input type="hidden" name="situacao" value="<%=strSituacao%>">
 									</form>
 								</div>
 							</div>
 						</div>
-						
 						<div class="clearfix"> </div>
 					</div>
 				</div>
@@ -207,6 +233,12 @@
 					classie.toggle( showLeftPush, 'disabled' );
 				}
 			}
+			
+			function alterar(perfilId){
+		
+				document.form01.action = "cadPerfil_01.asp?acao=A&perfilId=" + perfilId;
+				document.form01.submit();
+			}
 		</script>
 	<!-- Bootstrap Core JavaScript --> 
 		
@@ -215,7 +247,7 @@
         <script type="text/javascript" src="../js/dev-loaders.js"></script>
         <script type="text/javascript" src="../js/dev-layout-default.js"></script>
 		<script type="text/javascript" src="../js/jquery.marquee.js"></script>
-		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="../css/bootstrap.min.css" rel="stylesheet">
 
 		<script type="text/javascript" src="../js/jquery.jqcandlestick.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/jqcandlestick.css" />
@@ -231,70 +263,55 @@
 		<!-- input-forms -->
 		<script type="text/javascript" src="../js/valida.2.1.6.min.js"></script>
 		<script type="text/javascript" >
-			function verificaForcaSenha(){
-				senha = document.getElementById("senha").value;
-				forca = 0;
-				mostra = document.getElementById("mostra");
-				if((senha.length >= 4) && (senha.length <= 7)){
-					forca += 10;
-				}else if(senha.length>7){
-					forca += 25;
-				}
-				if(senha.match(/[a-z]+/)){
-					forca += 10;
-				}
-				if(senha.match(/[A-Z]+/)){
-					forca += 20;
-				}
-				if(senha.match(/d+/)){
-					forca += 20;
-				}
-				if(senha.match(/W+/)){
-					forca += 25;
-				}
-				return mostra_res();
-			}
-			function mostra_res(){
-				if(forca < 30){
-					mostra.innerHTML = '<tr><td bgcolor="red" width="'+forca+'"></td><td>Fraca </td></tr>';
-				}else if((forca >= 30) && (forca < 60)){
-					mostra.innerHTML = '<tr><td bgcolor="yellow" width="'+forca+'"></td><td>Justa </td></tr>';;
-				}else if((forca >= 60) && (forca < 85)){
-					mostra.innerHTML = '<tr><td bgcolor="blue" width="'+forca+'"></td><td>Forte </td></tr>';
-				}else{
-					mostra.innerHTML = '<tr><td bgcolor="green" width="'+forca+'"></td><td>Excelente </td></tr>';
+			function paginar(paginaSubmit,nuPagina){
+				if (nuPagina>0){
+					$('form').attr('action', paginaSubmit);
+					$('form').trigger( 'submit' );
 				}
 			}
-		
+			
+			function atualizaSituacao(valor){
+				var dados = $(this).serialize();
+				$.ajax({
+					url: 'atualizaSituacaoFuncao.asp?situacaoNova=' + valor,
+					type: 'POST',
+					dataType: 'html',
+					data: dados,
+					success: function(data){
+						if (data != ''){
+							if (data == '0'){
+								$("#msgSucesso").text('Situação alterada com sucesso!');
+								$("#msgSucesso").show();
+								$("#msgErro").text('');
+								$("#msgErro").hide();
+							}else{
+								$("#msgErro").text('Erro ao atualizar a situação da função!');
+								$("#msgErro").show();
+								$("#msgSucesso").text('');
+								$("#msgSucesso").hide();
+							}
+						}else{
+							$("#msgErro").text("");
+							$("#msgSucesso").text("");
+						}
+					}
+				});
+			}
+			
 		
 			$(document).ready( function(){
-				$('#empresa').change( function(){
-					//$('form').submit( function(){
-						var dados = $(this).serialize();
-						$.ajax({
-							url: 'carregaLoja.asp?linhaVazia=S&cliente_id=' + $('#empresa').val(),
-							type: 'POST',
-							dataType: 'html',
-							data: dados,
-							success: function(data){
-								
-								$('#loja'). empty(). html(data);
-							}
-						});
-					//return false;
-					//});
-					//$('form').trigger( 'submit' );
-				});
-				
-				$('#consultar').click( function(){
-					$('form').attr('action', 'consUsuario_02.asp');
-					$('form').trigger( 'submit' );
-				});
 				
 				$('#cadastrar').click( function(){
-					$('form').attr('action', 'cadUsuarioADM_01.asp');
+					$('form').attr('action', 'cadPerfil_01.asp');
 					$('form').trigger( 'submit' );
 				});
+				
+				$('#voltar').click( function(){
+					$('form').attr('action', 'consPerfil_01.asp');
+					$('form').trigger( 'submit' );
+				});
+				
+				
 			});
 			
 			/*$(function()
@@ -376,5 +393,8 @@
 		<!--//validator js-->
 	
 		
+
+
+
 </body>
 </html>

@@ -68,7 +68,7 @@
 					<!--grids-->
 				<div class="grids">
 					<div class="progressbar-heading grids-heading">
-						<h2>Usuário</h2>
+						<h2>Consulta Perfil</h2>
 					</div>
 					<div class="forms-grids">
 						<div class="col-md-12">
@@ -79,86 +79,12 @@
 											<%call msgRetornoSucesso()%>
 											<%call msgRetornoErro()%>
 										</div>
-										<label for="nomeUsuario" >Nome:</label>
-										<div class="form-group" >
-											<input type="text" name="nomeUsuario" id="nomeUsuario" class="form-control"	/>
-										</div>
-
-										<label for="field-1-3" >Login:</label>
+										<label for="loja" >Perfil:</label>
 										<div class="form-group">
-										  <input type="text"  maxlength="30" name="login" minlength="6" class="form-control" id="login"  />
-										   <div id="MsgErroLogin"></div>
-										   <div id="MsgVerificaLogin"></div>
+										  <input type="text"  maxlength="18" name="nome" class="form-control" id="perfil"  />
 										</div>
-										<label for="empresa" >Empresa:</label>
-										<div class="form-group" >
-											<select name="empresa" id="empresa" class="form-control" >
-												<option value=""></option>
-												<%
-												'coclocar por perfil, se o usuario for adm traz todos, se nao traz somente o cliente logado
-												strSql = "SELECT distinct en.nome nome_cliente, cl.cliente_id FROM [EVA].[dbo].[cliente] cl, [EVA].[dbo].[entidade] en, [EVA].[dbo].[loja_usuario] lu, [EVA].[dbo].[loja] lo where cl.entidade_id = en.entidade_id and cl.situacao = 'A' " & _
-														  "	and cl.cliente_id = lo.cliente_id  "
-												
-												if instr(session("perfil"),"1") = 0	then		
-													strSql = strSql & " and lu.usuario_id = " & session("usuario_id")
-												end if		  
-  
-												set objRS = server.createobject("adodb.recordset")
-												objRS.open strSql,conexao,3,3
-												if not objRS.eof then
-													do while not objRS.eof
-													%>
-														<option value="<%=objRS("cliente_id")%>"><%=objRS("nome_cliente")%></option>
-													<%
-													objRS.movenext
-													loop
-												end if
-												objRS.close
-												set objRS = nothing
-												%>
-											</select>
-										</div>
-										<label for="loja" >Loja:</label>
-										<div class="form-group" id="loja" >
-											<select name="loja" id="loja" class="form-control" >
-												<option value=""></option>
-											</select>
-										</div>
-										<label for="loja" >Situação:</label>
-										<div class="form-group" id="loja" >
-											<select name="situacao" id="situacao" class="form-control" >
-												<option value=""></option>
-												<option value="A">Ativo</option>
-												<option value="I">Inativo</option>
-											</select>
-										</div>
-										<label for="perfil" >Perfil de acesso:</label>
-										<div class="form-group" id="perfilacesso" >
-											<select name="perfil" id="perfil" class="form-control" multiple>
-												<option value=""></option>
-												<%
-												strSql = "select * from perfil p"
-												set objRS = server.createobject("adodb.recordset")
-												objRS.open strSql,conexao,3,3
-												if not objRS.eof then
-													do while not objRS.eof
-													%>
-														<option value="<%=objRS("perfil_id")%>"><%=objRS("nome")%></option>
-													<%
-													objRS.movenext
-													loop
-												end if
-												objRS.close
-												set objRS = nothing
-												%>
-											</select>
-											
-										</div>
-										
 										<hr >
 										<p>
-
-										
 										<%
 										'C'onsultar, 'I'ncluir,'A'lterar,'D'eletar,'E'xecutar,'L'impar	
 										'Consultar,Incluir,Alterar,Deletar,Executar
@@ -215,7 +141,7 @@
         <script type="text/javascript" src="../js/dev-loaders.js"></script>
         <script type="text/javascript" src="../js/dev-layout-default.js"></script>
 		<script type="text/javascript" src="../js/jquery.marquee.js"></script>
-		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="../css/bootstrap.min.css" rel="stylesheet">
 
 		<script type="text/javascript" src="../js/jquery.jqcandlestick.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/jqcandlestick.css" />
@@ -231,88 +157,17 @@
 		<!-- input-forms -->
 		<script type="text/javascript" src="../js/valida.2.1.6.min.js"></script>
 		<script type="text/javascript" >
-			function verificaForcaSenha(){
-				senha = document.getElementById("senha").value;
-				forca = 0;
-				mostra = document.getElementById("mostra");
-				if((senha.length >= 4) && (senha.length <= 7)){
-					forca += 10;
-				}else if(senha.length>7){
-					forca += 25;
-				}
-				if(senha.match(/[a-z]+/)){
-					forca += 10;
-				}
-				if(senha.match(/[A-Z]+/)){
-					forca += 20;
-				}
-				if(senha.match(/d+/)){
-					forca += 20;
-				}
-				if(senha.match(/W+/)){
-					forca += 25;
-				}
-				return mostra_res();
-			}
-			function mostra_res(){
-				if(forca < 30){
-					mostra.innerHTML = '<tr><td bgcolor="red" width="'+forca+'"></td><td>Fraca </td></tr>';
-				}else if((forca >= 30) && (forca < 60)){
-					mostra.innerHTML = '<tr><td bgcolor="yellow" width="'+forca+'"></td><td>Justa </td></tr>';;
-				}else if((forca >= 60) && (forca < 85)){
-					mostra.innerHTML = '<tr><td bgcolor="blue" width="'+forca+'"></td><td>Forte </td></tr>';
-				}else{
-					mostra.innerHTML = '<tr><td bgcolor="green" width="'+forca+'"></td><td>Excelente </td></tr>';
-				}
-			}
-		
-		
 			$(document).ready( function(){
-				$('#empresa').change( function(){
-					//$('form').submit( function(){
-						var dados = $(this).serialize();
-						$.ajax({
-							url: 'carregaLoja.asp?linhaVazia=S&cliente_id=' + $('#empresa').val(),
-							type: 'POST',
-							dataType: 'html',
-							data: dados,
-							success: function(data){
-								
-								$('#loja'). empty(). html(data);
-							}
-						});
-					//return false;
-					//});
-					//$('form').trigger( 'submit' );
-				});
-				
 				$('#consultar').click( function(){
-					$('form').attr('action', 'consUsuario_02.asp');
+					$('form').attr('action', 'consPerfil_02.asp');
 					$('form').trigger( 'submit' );
 				});
 				
 				$('#cadastrar').click( function(){
-					$('form').attr('action', 'cadUsuarioADM_01.asp');
+					$('form').attr('action', 'cadPerfil_01.asp');
 					$('form').trigger( 'submit' );
 				});
 			});
-			
-			/*$(function()
-			{
-				$("form").submit(function()
-				{
-					alert('oi');
-					
-					if(combo == "ha")
-					{
-						return true;	// NÃO PREVINE o envio do formulário
-					}
-					else
-					{
-						return false;	// PREVINE o envio do formulário
-					}
-				});
-			});*/
 			
 			
 			$(document).ready(function() {
